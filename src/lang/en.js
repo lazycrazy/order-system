@@ -56,7 +56,7 @@ export default {
     i18n: 'I18n',
     changePassword: 'Change Password',
     orderPropertySetting: 'Order Property Setting',
-    rolePermission: 'Role Permission'    
+    rolePermission: 'Role Permission'
   },
   navbar: {
     logOut: 'Log Out',

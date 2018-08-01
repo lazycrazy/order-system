@@ -1,5 +1,20 @@
 import request from '@/utils/request'
 
+export function getRolePermission() {
+  return request({
+    url: '/query/rolePermission',
+    method: 'get'
+  })
+}
+
+export function setRolePermission(data) {
+  return request({
+    url: '/query/rolePermission',
+    method: 'put',
+    data
+  })
+}
+
 export function getOrderProperty() {
   return request({
     url: '/query/orderProperty',

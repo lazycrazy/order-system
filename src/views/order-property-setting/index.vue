@@ -122,15 +122,15 @@ export default {
   methods: {
     async fetchData() {
       const res = await this.$store.dispatch('GetOrderProperty')
-      res.mlsxs.forEach(i => i.allowOrder = !i.forbidden)
-      res.pldxzs.forEach(i => i.allowOrder = !i.forbidden)
-      res.shops.forEach(i => i.allowOrder = !i.forbidden)
-      res.xssxs.forEach(i => i.allowOrder = !i.forbidden)
+      res.mlsxs.forEach(i => { i.allowOrder = !i.forbidden })
+      res.pldxzs.forEach(i => { i.allowOrder = !i.forbidden })
+      res.shops.forEach(i => { i.allowOrder = !i.forbidden })
+      res.xssxs.forEach(i => { i.allowOrder = !i.forbidden })
       this.propertys = res
     },
     async handleSwitch(row) {
       try {
-        const res = await this.$store.dispatch('SetOrderProperty', Object.assign({}, row))
+        await this.$store.dispatch('SetOrderProperty', Object.assign({}, row))
         row.isnew = false
         this.$message.success('设置成功')
       }
