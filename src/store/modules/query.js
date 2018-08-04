@@ -1,4 +1,4 @@
-import { getOrderProperty, setOrderProperty, getRolePermission, setRolePermission } from '@/api/query'
+import { getOrderProperty, setOrderProperty, getRolePermission, setRolePermission, getShop } from '@/api/query'
 
 const query = {
   state: {
@@ -8,6 +8,17 @@ const query = {
   },
 
   actions: {
+    GetShop({ commit }) {
+      return new Promise((resolve, reject) => {
+        getShop().then(response => {
+          const data = response.data
+          resolve(data)
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+
     GetRolePermission({ commit }) {
       return new Promise((resolve, reject) => {
         getRolePermission().then(response => {

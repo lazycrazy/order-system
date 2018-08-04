@@ -133,8 +133,7 @@ export default {
         await this.$store.dispatch('SetOrderProperty', Object.assign({}, row))
         row.isnew = false
         this.$message.success('设置成功')
-      }
-      catch (err) {
+      } catch (err) {
         row.allowOrder = !row.allowOrder
         this.$message.error('设置失败')
       }

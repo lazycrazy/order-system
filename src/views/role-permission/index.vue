@@ -16,7 +16,7 @@
       <el-radio-button :label="0">无</el-radio-button>
       <el-radio-button :label="1">一审</el-radio-button>
       <el-radio-button :label="2">二审</el-radio-button>
-      <el-radio-button :label="3">三审</el-radio-button>
+      <el-radio-button :label="3" v-if='isHQ'>三审</el-radio-button>
     </el-radio-group>     
       </template>
     </el-table-column>
@@ -31,10 +31,13 @@ export default {
   data() {
     return {
       activeName: 'first',
-      permissions: []
+      permissions: [],
+      isHQ: false
     }
   },
   async created() {
+    console.log(process.env)    
+    this.isHQ = process.env.SYS === "SC"
     await this.fetchData()
   },
   methods: {
@@ -47,11 +50,9 @@ export default {
       try {
         await this.$store.dispatch('SetRolePermission', Object.assign({}, row))
         this.$message.success('设置成功')
-      }
-      catch (err) {
+      } catch (err) {
         this.$message.error('设置失败')
-      }
-      finally{
+      } finally {
         await this.fetchData()
       }
     },

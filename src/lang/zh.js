@@ -56,7 +56,8 @@ export default {
     i18n: '国际化',
     changePassword: '修改密码',
     orderPropertySetting: '可订货属性设置',
-    rolePermission: '角色审批权限设置'
+    rolePermission: '角色审批权限设置',
+    functionSetting: '审批功能设置'
   },
   navbar: {
     logOut: '退出登录',

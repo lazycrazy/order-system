@@ -1,5 +1,12 @@
 import request from '@/utils/request'
 
+export function getShop() {
+  return request({
+    url: '/query/shop',
+    method: 'get'
+  })
+}
+
 export function getRolePermission() {
   return request({
     url: '/query/rolePermission',
@@ -9,7 +16,7 @@ export function getRolePermission() {
 
 export function setRolePermission(data) {
   return request({
-    url: '/query/rolePermission',
+    url: '/set/rolePermission',
     method: 'put',
     data
   })
@@ -24,7 +31,7 @@ export function getOrderProperty() {
 
 export function setOrderProperty(data) {
   return request({
-    url: '/query/orderProperty',
+    url: '/set/orderProperty',
     method: 'put',
     data
   })

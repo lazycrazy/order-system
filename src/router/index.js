@@ -71,22 +71,6 @@ export const asyncRouterMap = [
     ]
   },
   {
-    path: '/member',
-    component: Layout,
-    redirect: 'noredirect',
-    name: 'member',
-    meta: {
-      title: 'member',
-      icon: 'member',
-      roles: ['admin'],
-      sys: ['HQ']
-    },
-    children: [
-      { path: 'list', component: _import('member/list'), name: 'memberList', meta: { title: 'memberList', icon: 'table' }},
-      { path: 'pointlog', component: _import('member/pointlog'), name: 'pointLog', meta: { title: 'pointlog', icon: 'table' }}
-    ]
-  },
-  {
     path: '/change-password',
     component: Layout,
     children: [{ path: 'index', component: () => import('@/views/change-password/index'), name: 'change-password', meta: { title: 'changePassword', icon: 'form' }}]
@@ -96,6 +80,7 @@ export const asyncRouterMap = [
     component: Layout,
     meta: {
       title: 'orderPropertySetting',
+      roles: ['admin'],
       sys: ['HQ']
     },
     children: [{ path: 'index', component: () => import('@/views/order-property-setting/index'), name: 'order-property-setting', meta: { title: 'orderPropertySetting', icon: 'form' }}]
@@ -104,9 +89,20 @@ export const asyncRouterMap = [
     path: '/role-permission',
     component: Layout,
     meta: {
-      title: 'rolePermission'
+      title: 'rolePermission',
+      roles: ['admin']
     },
     children: [{ path: 'index', component: () => import('@/views/role-permission/index'), name: 'role-permission', meta: { title: 'rolePermission', icon: 'form' }}]
+  },
+  {
+    path: '/function-setting',
+    component: Layout,
+    meta: {
+      title: 'functionSetting',
+      roles: ['admin'],
+      sys: ['HQ']
+    },
+    children: [{ path: 'index', component: () => import('@/views/function-setting/index'), name: 'functionSetting', meta: { title: 'functionSetting', icon: 'form' }}]
   },
   { path: '*', redirect: '/404', hidden: true }
 ]
