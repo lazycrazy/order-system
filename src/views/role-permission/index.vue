@@ -36,8 +36,7 @@ export default {
     }
   },
   async created() {
-    console.log(process.env)    
-    this.isHQ = process.env.SYS === "SC"
+    this.isHQ = process.env.SYS === "HQ"
     await this.fetchData()
   },
   methods: {
