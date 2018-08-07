@@ -6,7 +6,9 @@ import {
   getShop, 
   getShopGoods,
   getFunctionSetting,
-  setFunctionSetting
+  setFunctionSetting,
+  deleteFunctionSetting,
+  setFunctionSettingByShop
 } from '@/api/query'
 
 const query = {
@@ -17,8 +19,16 @@ const query = {
   },
 
   actions: {
+    async SetFunctionSettingByShop({ commit }, data) {
+      const res = await setFunctionSettingByShop(data)
+      return res.data
+    },
     async SetFunctionSetting({ commit }, data) {
       const res = await setFunctionSetting(data)
+      return res.data
+    },
+    async DeleteFunctionSetting({ commit }, data) {
+      const res = await deleteFunctionSetting(data)
       return res.data
     },
     GetFunctionSetting({ commit }, data) {

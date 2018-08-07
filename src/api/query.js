@@ -1,5 +1,20 @@
 import request from '@/utils/request'
 
+export function setFunctionSettingByShop(data) {
+  return request({
+    url: `/set/functionSettingByShop`,
+    method: 'post',
+    data
+  })
+}
+
+export function deleteFunctionSetting(data) {
+  return request({
+    url: `/set/functionSetting`,
+    method: 'delete',
+    data
+  })
+}
 export function setFunctionSetting(data) {
   return request({
     url: `/set/functionSetting`,
@@ -10,8 +25,9 @@ export function setFunctionSetting(data) {
 
 export function getFunctionSetting(data) {
   return request({
-    url: `/query/functionSetting/${data.shopid}/${data.funcid}`,
-    method: 'get'
+    url: `/query/functionSetting`,
+    method: 'post',
+    data
   })
 }
 

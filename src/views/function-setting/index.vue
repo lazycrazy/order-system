@@ -9,7 +9,7 @@
       :value="item.value">
     </el-option>
   </el-select>
-  <el-button type="primary">复制应用到它店</el-button>
+  <el-button type="primary" @click.native.prevent="dialogSelectShopVisible=true">复制应用到它店</el-button>
 
  
 <div class='content'>
@@ -34,18 +34,22 @@
       <el-radio-button :label="2">二级审批</el-radio-button>
       <el-radio-button :label="3">三级审批</el-radio-button>
     </el-radio-group>
-    <el-table
+    <el-table class='fstable' 
     v-loading="table_loading"
     :data="functionSettings" >
+    <el-table-column
+      type="index"
+      width="50">
+    </el-table-column>
      <el-table-column 
-      label="商品">
+      label="商品" width='400px'>
       <template slot-scope="scope">
         <span style="margin-left: 10px">{{ scope.row.goodsname }}</span>
       </template>
     </el-table-column>
       <el-table-column
         prop="deptname"
-        label="小类">
+        label="小类" width='130'>
       </el-table-column>
       <el-table-column
       prop="ordermultiple"
@@ -74,11 +78,15 @@
         <el-button
           size="mini"
           type="danger"
-          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          @click="handleDelete(scope.row)">删除</el-button>
       </template>
     </el-table-column>
   </el-table>
 
+   <div class="pagination-container">
+      <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="curpage" :page-sizes="[100,200,300, 500]" :page-size="page_size" layout="total, sizes, prev, pager, next, jumper" :total="total">
+      </el-pagination>
+    </div>
   </div>
 
 </div>
@@ -108,6 +116,18 @@
       </div>
     </el-dialog>
        
+
+  <el-dialog title="选择应用同样设置的店" :visible.sync="dialogSelectShopVisible"  width="30%">
+       
+          <el-checkbox-group v-model="checkShops" class='checkgroup'>
+           <el-checkbox v-for="s in shops" :label="s.value" :key="s.value" :disabled="curshop === s.value" border>{{s.label}}</el-checkbox>
+          </el-checkbox-group>
+        
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogSelectShopVisible = false">{{$t('table.cancel')}}</el-button>
+        <el-button type="primary" @click="confirmShops">{{$t('table.confirm')}}</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -120,6 +140,7 @@ export default {
     return {
       functionSettings: [],
       shops: [], 
+      checkShops: [],
       curshop: null,
       curfunc: 1,
       shopGoods: [],
@@ -137,13 +158,17 @@ export default {
         day_limit_amt: 0.00
       },
       dialogFormVisible: false,
+      dialogSelectShopVisible: false,
       rules: {
         multiple: [{ type: 'number', message: '必须为数字值'}],
         num: [{ type: 'number', message: '必须为数字值'}],
         amt: [{ type: 'number', message: '必须为数字值'}],
         day_limit_num: [{ type: 'number', message: '必须为数字值'}, { required: true, message: '不能为空', trigger: 'blur' }],
         day_limit_amt: [{ type: 'number', message: '必须为数字值'}, { required: true, message: '不能为空', trigger: 'blur' }]
-      }
+      },
+      curpage: 1,
+      page_size: 100,
+      total: 0
     }    
   },
   async created() {
@@ -155,7 +180,7 @@ export default {
       this.shops = res
       if (this.shops.length > 0) {
         this.curshop = this.shops[0].value
-        await this.handleShopChange(this.curshop) 
+        this.handleShopChange(this.curshop) 
       }
     },
 
@@ -187,19 +212,31 @@ export default {
       if(!this.curfunc || !this.curshop) return 
       this.table_loading = true
       let that = this      
-      const fs = await that.$store.dispatch('GetFunctionSetting', { shopid: that.curshop, funcid: that.curfunc })
+      const res = await that.$store.dispatch('GetFunctionSetting', { shopid: that.curshop, funcid: that.curfunc, curpage: that.curpage || 1 , pagesize: that.page_size || 100 })
       console.log('fs')
-      console.log(fs)
-      that.functionSettings = fs
+      console.log(res)
+      that.functionSettings = res.fs
+      that.total = res.total
       console.log('fs loaded')
       that.table_loading = false
       that.$message.success('功能数据加载完成')           
     },
-    handleShopChange(curshop) {
-      Promise.all([this.refreshShopGoods(),this.refreshFunctionSettings()])       
+    async handleShopChange(curshop) {
+      await Promise.all([this.refreshShopGoods(),this.refreshFunctionSettings()])       
     },
     async handleFunctionChange(row) {
         await this.refreshFunctionSettings()
+    },
+    handleSizeChange(val) {
+      this.page_size = val
+      this.refreshFunctionSettings()
+    },
+    handleCurrentChange(val) {
+      this.curpage = val
+      this.refreshFunctionSettings()
+    },
+    handleOpenSelectShops(){
+      this.dialogSelectShopVisible = true
     },
     handleAdd() {
       const ns = this.$refs.tree.getCheckedNodes().filter(n=>n.type===6)
@@ -225,6 +262,28 @@ export default {
     },
     handleCheckChange() {
       //console.log(arguments);      
+    },
+    async handleDelete(row){
+      const rs = await this.$store.dispatch('DeleteFunctionSetting', {shopid: row.ShopId
+, functionid: row.FunctionId, goodsid: row.GoodsId})
+      await this.refreshFunctionSettings()
+      this.$message({
+        message: '删除成功',
+        type: 'success'
+      })
+    },
+    async confirmShops() { 
+      if(this.checkShops.length ===0) return
+      const res = await this.$store.dispatch('SetFunctionSettingByShop', {curshop: this.curshop, shops: this.checkShops})
+      // console.log(res)
+      this.dialogSelectShopVisible = false
+      this.checkShops= []
+      this.$notify({
+        title: '成功',
+        message: '应用到它店成功',
+        type: 'success',
+        duration: 2000
+      })
     },
     confirm() {
       const that = this
@@ -294,6 +353,20 @@ $light_gray:#fff;
       padding: 10px;
       flex-grow: 2;
       overflow-x: scroll;
+      .fstable{
+        border:2px solid beige;
+        border-radius: 1px;
+      }
+    }
+  }
+  .checkgroup{
+    display: flex;
+    flex-wrap: wrap;
+    flex-flow: column;
+    overflow-y: scroll;
+    height: 300px;
+    :first-child{
+      margin-left: 10px;
     }
   }
 }
