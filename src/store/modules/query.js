@@ -5,7 +5,8 @@ import {
   setRolePermission, 
   getShop, 
   getShopGoods,
-  getFunctionSetting 
+  getFunctionSetting,
+  setFunctionSetting
 } from '@/api/query'
 
 const query = {
@@ -16,6 +17,10 @@ const query = {
   },
 
   actions: {
+    async SetFunctionSetting({ commit }, data) {
+      const res = await setFunctionSetting(data)
+      return res.data
+    },
     GetFunctionSetting({ commit }, data) {
       return new Promise((resolve, reject) => {
         getFunctionSetting(data).then(response => {

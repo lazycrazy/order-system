@@ -1,5 +1,13 @@
 import request from '@/utils/request'
 
+export function setFunctionSetting(data) {
+  return request({
+    url: `/set/functionSetting`,
+    method: 'post',
+    data
+  })
+}
+
 export function getFunctionSetting(data) {
   return request({
     url: `/query/functionSetting/${data.shopid}/${data.funcid}`,
