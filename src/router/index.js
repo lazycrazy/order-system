@@ -54,23 +54,6 @@ export default new Router({
 
 export const asyncRouterMap = [
   {
-    path: '/article',
-    component: Layout,
-    redirect: 'noredirect',
-    name: 'article',
-    meta: {
-      title: 'article',
-      icon: 'article',
-      roles: ['admin', 'editor'],
-      sys: ['HQ']
-    },
-    children: [
-      { path: 'list', component: _import('article/list'), name: 'articleList', meta: { title: 'articleList', icon: 'table' }},
-      { path: 'create', component: _import('article/create'), name: 'createArticle', meta: { title: 'createArticle', icon: 'form' }},
-      { path: 'edit', component: _import('article/edit'), name: 'editArticle', hidden: true, meta: { title: 'editArticle', icon: 'form' }}
-    ]
-  },
-  {
     path: '/change-password',
     component: Layout,
     children: [{ path: 'index', component: () => import('@/views/change-password/index'), name: 'change-password', meta: { title: 'changePassword', icon: 'form' }}]
