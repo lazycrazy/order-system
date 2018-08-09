@@ -1,5 +1,21 @@
 import request from '@/utils/request'
 
+export function getSheetDetail(data) {
+  return request({
+    url: `/purchase/itemBySheetIds`,
+    method: 'post',
+    data
+  })
+}
+
+export function getSheets(data) {
+  return request({
+    url: `/purchase/listByShop`,
+    method: 'post',
+    data
+  })
+}
+
 export function setFunctionSettingByShop(data) {
   return request({
     url: `/set/functionSettingByShop`,

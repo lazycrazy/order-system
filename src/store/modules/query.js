@@ -8,7 +8,9 @@ import {
   getFunctionSetting,
   setFunctionSetting,
   deleteFunctionSetting,
-  setFunctionSettingByShop
+  setFunctionSettingByShop,
+  getSheets,
+  getSheetDetail
 } from '@/api/query'
 
 const query = {
@@ -19,6 +21,14 @@ const query = {
   },
 
   actions: {
+    async GetSheetDetail({ commit }, data) {
+      const res = await getSheetDetail(data)
+      return res.data
+    },
+    async GetSheets({ commit }, data) {
+      const res = await getSheets(data)
+      return res.data
+    },
     async SetFunctionSettingByShop({ commit }, data) {
       const res = await setFunctionSettingByShop(data)
       return res.data
