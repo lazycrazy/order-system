@@ -87,5 +87,14 @@ export const asyncRouterMap = [
     },
     children: [{ path: 'index', component: () => import('@/views/function-setting/index'), name: 'functionSetting', meta: { title: 'functionSetting', icon: 'form' }}]
   },
+  {
+    path: '/order-review',
+    component: Layout,
+    meta: {
+      title: 'orderReview',
+      roles: ['admin']
+    },
+    children: [{ path: 'index', component: () => import('@/views/order-review/index'), name: 'orderReview', meta: { title: 'orderReview', icon: 'table' }}]
+  },
   { path: '*', redirect: '/404', hidden: true }
 ]

@@ -57,7 +57,8 @@ export default {
     changePassword: 'Change Password',
     orderPropertySetting: 'Order Property Setting',
     rolePermission: 'Role Permission',
-    functionSetting: 'function setting'
+    functionSetting: 'Function Setting',
+    orderReview: 'Order Review'
   },
   navbar: {
     logOut: 'Log Out',
