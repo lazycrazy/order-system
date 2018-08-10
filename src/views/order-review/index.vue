@@ -8,7 +8,7 @@
         :value="item.value">
       </el-option>
     </el-select>
-  <el-button type="primary" @click.native.prevent="SearchSheet">{{$t('table.search')}}</el-button>
+  <!-- <el-button type="primary" @click.native.prevent="SearchSheet">{{$t('table.search')}}</el-button> -->
  
     <div class='top'>       
       <el-table class='fstable' ref="head" height="300" highlight-current-row @current-change="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
@@ -47,9 +47,9 @@
         <el-tab-pane label="明细" name="first">
           <el-table class='items' v-loading="table_loading" :data="items" max-height='500'  width='100%' >
             <el-table-column type="index" width="50"></el-table-column>
-            <el-table-column label="修改">
+            <el-table-column label="编辑">
                <template slot-scope="scope">
-                <el-button size="mini" type="danger" @click="handleUpdate(scope.row)">修改</el-button>
+                <el-button size="mini" type="danger" @click="openEditForm(scope.row)">编辑</el-button>
               </template>
             </el-table-column>
              <el-table-column label="商品" width='250'>
@@ -75,15 +75,24 @@
         </el-table-column>
         <el-table-column prop="LogUser" label="操作人"></el-table-column>   
         <el-table-column prop="LogDesc" label="描述"></el-table-column>
+        <el-table-column prop="GoodsID" label="商品ID"></el-table-column>
+        <el-table-column prop="Qty" label="数量"></el-table-column>
       </el-table>
     </el-tab-pane>
      
   </el-tabs>
-      
-
-      
     </div>
-
+<el-dialog title="修改订货数量" :visible.sync="dialogFormVisible"  width="35%">
+      <el-form :rules="rules" ref="dataForm" :model="temp" label-position="right" label-width="130px" >        
+      <el-form-item label="订货数" prop="num">
+        <el-input type="number" autofocus v-model.number="temp.num" placeholder='0.00' min="0.00" step="0.01" auto-complete="off"></el-input>
+      </el-form-item> 
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">{{$t('table.cancel')}}</el-button>
+        <el-button type="primary" @click="confirm">{{$t('table.confirm')}}</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -142,33 +151,33 @@ export default {
       },
       tree_loading: false,
       table_loading: false,
-      temp: {
-        multiple: 0.00,
-        num: 0.00,
-        amt: 0.00,
-        day_limit_num: 0.00,
-        day_limit_amt: 0.00
+      temp: {        
+        num: 0.00
       },
       dialogFormVisible: false,
-      dialogSelectShopVisible: false,
       rules: {
-        multiple: [{ type: 'number', message: '必须为数字值'}],
-        num: [{ type: 'number', message: '必须为数字值'}],
-        amt: [{ type: 'number', message: '必须为数字值'}],
-        day_limit_num: [{ type: 'number', message: '必须为数字值'}, { required: true, message: '不能为空', trigger: 'blur' }],
-        day_limit_amt: [{ type: 'number', message: '必须为数字值'}, { required: true, message: '不能为空', trigger: 'blur' }]
+        num: [{ type: 'number', message: '必须为数字值'}, { required: true, message: '不能为空', trigger: 'blur' }],
       },
       curpage: 1,
       page_size: 10,
       total: 0,
       auth: 0,
-      reviewDesc: ['一审','二审','三审']
+      reviewDesc: ['一审','二审','三审'],
+      editRow: null
     }    
   },
   async created() {
     await this.fetchData()
   },
   methods: {
+    openEditForm(row){
+       this.dialogFormVisible = true
+       this.editRow = row
+       this.temp.num = row.Qty
+       this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
     async review(auth, row){
       const resl = await this.$store.dispatch('SetSheetLog', { sheetid: row.SheetID, desc: this.reviewDesc[auth - 1] })
       console.log(resl)
@@ -180,6 +189,8 @@ export default {
         type: 'success',
         duration: 2000
       })
+      this.items = []
+      this.logs = []
       await this.SearchSheet()
     },
     async logNext(auth, row){
@@ -231,8 +242,8 @@ export default {
     },    
     async handleCurSheetChange(curSheet) {
       const res = await this.$store.dispatch('GetSheetDetail', { sheetids: [curSheet.SheetID]})
-      console.log(res)
-      this.items = res[0]
+      const items = res[0]
+      this.items = items
       this.logs = res[1]
     },
     async handleShopChange(curshop) {
@@ -246,54 +257,25 @@ export default {
       this.curpage = val
       this.SearchSheet()
     },
-    handleOpenSelectShops(){
-      this.dialogSelectShopVisible = true
-    },
-    handleAdd() {
-      const ns = this.$refs.tree.getCheckedNodes().filter(n=>n.type===6)
-      if (ns.length ===0 )
-      {
-        this.$message.warning('请勾选商品')
-        return
-      }
-
-      this.temp = {
-        multiple: 0.00,
-        num: 0.00,
-        amt: 0.00,
-        day_limit_num: 0.00,
-        day_limit_amt: 0.00
-      }
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-      // this.$refs.tree.setCheckedKeys([3]);
-      // this.$refs.tree.setCheckedKeys([]);
-    },
-    handleCheckChange() {
-      //console.log(arguments);      
-    },
-    async handleUpdate(row){
-      const rs = await this.$store.dispatch('DeleteFunctionSetting', {shopid: row.ShopId
-, functionid: row.FunctionId, goodsid: row.GoodsId})
-      await this.SearchSheet()
-      this.$message({
-        message: '删除成功',
-        type: 'success'
-      })
-    },
-    async confirmShops() { 
-      if(this.checkShops.length ===0) return
-      const res = await this.$store.dispatch('SetFunctionSettingByShop', {curshop: this.curshop, shops: this.checkShops})
-      // console.log(res)
-      this.dialogSelectShopVisible = false
-      this.checkShops= []
-      this.$notify({
-        title: '成功',
-        message: '应用到它店成功',
-        type: 'success',
-        duration: 2000
+    confirm() {
+      const that = this
+      this.$refs['dataForm'].validate(async (valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, that.temp)
+          const obj = {sheetid: that.editRow.SheetID, goodsid: that.editRow.GoodsID,  qty: tempData.num, desc:"编辑" }           
+          const res = await that.$store.dispatch('UpdateItem', obj)
+          console.log(res)
+          await that.handleCurSheetChange({SheetID: that.editRow.SheetID})
+          that.dialogFormVisible = false
+          that.editRow = null
+          that.$notify({
+            title: '成功',
+            message: '修改成功',
+            type: 'success',
+            duration: 2000
+          })
+          // })
+        }
       })
     }
   }

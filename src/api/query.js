@@ -1,5 +1,14 @@
 import request from '@/utils/request'
 
+export function updateItem(data) {
+  return request({
+    url: `/purchase/updateItemAndLog`,
+    method: 'post',
+    data
+  })
+}
+
+
 export function reviewSheet(data) {
   return request({
     url: `/purchase/review`,

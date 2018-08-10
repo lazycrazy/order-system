@@ -14,7 +14,8 @@ import {
   getUserReviewAuth,
   getItemReason,
   setSheetLog,
-  reviewSheet
+  reviewSheet,
+  updateItem
 } from '@/api/query'
 
 const query = {
@@ -25,6 +26,10 @@ const query = {
   },
 
   actions: {
+    async UpdateItem({ commit }, data) {
+      const res = await updateItem(data)
+      return res.data
+    },
     async SetSheetLog({ commit }, data) {
       const res = await setSheetLog(data)
       return res.data
