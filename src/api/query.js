@@ -1,5 +1,20 @@
 import request from '@/utils/request'
 
+export function getItemReason(data) {
+  return request({
+    url: `/purchase/itemReason`,
+    method: 'post',
+    data
+  })
+}
+
+export function getUserReviewAuth() {
+  return request({
+    url: `/purchase/reviewAuth`,
+    method: 'get'
+  })
+}
+
 export function getSheetDetail(data) {
   return request({
     url: `/purchase/itemBySheetIds`,

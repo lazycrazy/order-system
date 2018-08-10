@@ -13,23 +13,23 @@
     <div class='top'>       
       <el-table class='fstable' height="300" highlight-current-row @current-change="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
         <el-table-column   type="index"   width="50"> </el-table-column>
-        <el-table-column  prop="ShopName"   label="店铺" width='130'></el-table-column>     
-        <el-table-column   prop="SheetID"   label="单号"  ></el-table-column>
+        <el-table-column  prop="ShopName"   label="店铺" width='190'></el-table-column>     
+        <el-table-column   prop="SheetID"  width='160' label="单号"  ></el-table-column>
         <el-table-column   prop="ManageDeptID" label="ManageDeptID" > </el-table-column>
-        <el-table-column   prop="AskType" label="AskType"  > </el-table-column>
-        <el-table-column   prop="Flag" label="Flag"  > </el-table-column>
-        <el-table-column   prop="Editor" label="编辑人" >  </el-table-column>
+        <el-table-column   prop="AskType" width='80'  label="AskType"  > </el-table-column>
+        <el-table-column   prop="Flag" width='60' label="Flag"  > </el-table-column>
+        <el-table-column   prop="Editor"  width='80' label="编辑人" >  </el-table-column>
         <el-table-column   label="编辑时间" >
           <template slot-scope="scope">
             <span>{{scope.row.EditDate | parseTime('{y}-{m}-{d} {h}:{i}')}}</span>
           </template>
         </el-table-column>
         <el-table-column   prop="Operator"  label="操作人" ></el-table-column>
-        <el-table-column label="审核">
+        <el-table-column label="审批">
           <template slot-scope="scope">
-            <el-button size="mini" type="danger" @click="first(scope.row)">一审</el-button>
-            <el-button size="mini" type="danger" @click="second(scope.row)">二审</el-button>
-            <el-button size="mini" type="danger" @click="third(scope.row)">三审</el-button>
+            <el-button size="mini" type="danger" v-if="canReview(1, scope.row)" @click="first(scope.row)">一审</el-button>
+            <el-button size="mini" type="danger" v-if="canReview(2, scope.row)" @click="second(scope.row)">二审</el-button>
+            <el-button size="mini" type="danger" v-if="canReview(3, scope.row)" @click="third(scope.row)">三审</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -41,7 +41,7 @@
     </div>
 
     <div class='bottom'>
-      <el-tabs class='tab'>
+      <el-tabs class='tab' value='first' type="border-card">
         <el-tab-pane label="明细" name="first">
           <el-table class='items' v-loading="table_loading" :data="items"  width='100%' >
             <el-table-column type="index" width="50"></el-table-column>
@@ -126,7 +126,7 @@ export default {
       sheets: [],
       items: [],
       logs: [],
-      shops: [], 
+      shops: [],
       checkShops: [],
       curshop: null,
       shopGoods: [],
@@ -154,14 +154,22 @@ export default {
       },
       curpage: 1,
       page_size: 10,
-      total: 0
+      total: 0,
+      auth: 0
     }    
   },
   async created() {
     await this.fetchData()
   },
   methods: {
+    canReview(auth, row){
+       const can = this.auth === auth && !row.reason
+       return can
+    },
     async fetchData() {
+      const auth = await this.$store.dispatch('GetUserReviewAuth')
+      console.log(auth)
+      this.auth = auth
       const res = await this.$store.dispatch('GetShop')
       this.shops = res
       if (this.shops.length > 0) {
@@ -172,15 +180,25 @@ export default {
     async SearchSheet() {
       if(!this.curshop) return 
       this.table_loading = true
-      let that = this      
-      const res = await that.$store.dispatch('GetSheets', { shopid: that.curshop, curpage: that.curpage || 1 , pagesize: that.page_size || 10 })
-      
-      console.log(res)
-      that.sheets = res.fs
-      that.total = res.total
-      
-      that.table_loading = false
-      that.$message.success('单据加载完成')           
+      const res = await this.$store.dispatch('GetSheets', { shopid: this.curshop, curpage: this.curpage || 1 , pagesize: this.page_size || 10 })
+      const sheets = res.fs
+      this.total = res.total
+      if(sheets.length > 0){
+        const sheetids = sheets.map(s=> s. SheetID)
+        const reasons = await this.$store.dispatch('GetItemReason', { sheetids })
+        const reasonObj = groupBy(reasons, 'SheetID')
+
+        for(const s of sheets){
+          const sr = reasonObj[s.SheetID]
+          if(sr) {
+             const r = sr.map(i=>i.reason).join()
+             s.reason = r //this.$set(s,'reason', r)
+            }
+        }
+      }      
+      this.sheets = sheets
+      this.table_loading = false
+      this.$message.success('单据加载完成')           
     },    
     async handleCurSheetChange(curSheet) {
       const res = await this.$store.dispatch('GetSheetDetail', { sheetids: [curSheet.SheetID]})

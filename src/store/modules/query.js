@@ -10,7 +10,9 @@ import {
   deleteFunctionSetting,
   setFunctionSettingByShop,
   getSheets,
-  getSheetDetail
+  getSheetDetail,
+  getUserReviewAuth,
+  getItemReason
 } from '@/api/query'
 
 const query = {
@@ -21,6 +23,15 @@ const query = {
   },
 
   actions: {
+    
+    async GetItemReason({ commit }, data) {
+      const res = await getItemReason(data)
+      return res.data
+    },
+    async GetUserReviewAuth({ commit }) {
+      const res = await getUserReviewAuth()
+      return res.data
+    },
     async GetSheetDetail({ commit }, data) {
       const res = await getSheetDetail(data)
       return res.data

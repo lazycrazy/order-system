@@ -58,7 +58,7 @@ export default {
     orderPropertySetting: '可订货属性设置',
     rolePermission: '角色审批权限设置',
     functionSetting: '审批功能设置',
-    orderReview: '订货审核'
+    orderReview: '订货审批'
   },
   navbar: {
     logOut: '退出登录',
