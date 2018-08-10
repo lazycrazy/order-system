@@ -1,5 +1,20 @@
 import request from '@/utils/request'
 
+export function reviewSheet(data) {
+  return request({
+    url: `/purchase/review`,
+    method: 'post',
+    data
+  })
+}
+
+export function setSheetLog(data) {
+  return request({
+    url: `/purchase/sheetLog`,
+    method: 'post',
+    data
+  })
+}
 export function getItemReason(data) {
   return request({
     url: `/purchase/itemReason`,

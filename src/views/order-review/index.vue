@@ -11,7 +11,7 @@
   <el-button type="primary" @click.native.prevent="SearchSheet">{{$t('table.search')}}</el-button>
  
     <div class='top'>       
-      <el-table class='fstable' height="300" highlight-current-row @current-change="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
+      <el-table class='fstable' ref="head" height="300" highlight-current-row @current-change="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
         <el-table-column   type="index"   width="50"> </el-table-column>
         <el-table-column  prop="ShopName"   label="店铺" width='190'></el-table-column>     
         <el-table-column   prop="SheetID"  width='160' label="单号"  ></el-table-column>
@@ -27,9 +27,11 @@
         <el-table-column   prop="Operator"  label="操作人" ></el-table-column>
         <el-table-column label="审批">
           <template slot-scope="scope">
-            <el-button size="mini" type="danger" v-if="canReview(1, scope.row)" @click="first(scope.row)">一审</el-button>
-            <el-button size="mini" type="danger" v-if="canReview(2, scope.row)" @click="second(scope.row)">二审</el-button>
-            <el-button size="mini" type="danger" v-if="canReview(3, scope.row)" @click="third(scope.row)">三审</el-button>
+            <el-button size="mini" type="danger" v-if="canReview(1, scope.row)" @click="review(1, scope.row)">{{reviewDesc[0]}}</el-button>
+            <el-button size="mini" type="danger" v-if="canNextReview(1, scope.row)" @click="logNext(1, scope.row)">下一级审批</el-button>
+            <el-button size="mini" type="danger" v-if="canReview(2, scope.row)" @click="review(2, scope.row)">{{reviewDesc[1]}}</el-button>
+            <el-button size="mini" type="danger" v-if="canNextReview(2, scope.row)" @click="logNext(2, scope.row)">下一级审批</el-button>
+            <el-button size="mini" type="danger" v-if="canReview(3, scope.row)" @click="review(3, scope.row)">{{reviewDesc[2]}}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -41,9 +43,9 @@
     </div>
 
     <div class='bottom'>
-      <el-tabs class='tab' value='first' type="border-card">
+      <el-tabs class='tab' value='second' type="border-card">
         <el-tab-pane label="明细" name="first">
-          <el-table class='items' v-loading="table_loading" :data="items"  width='100%' >
+          <el-table class='items' v-loading="table_loading" :data="items" max-height='500'  width='100%' >
             <el-table-column type="index" width="50"></el-table-column>
             <el-table-column label="修改">
                <template slot-scope="scope">
@@ -66,7 +68,11 @@
     <el-tab-pane label="日志" name="second">
       <el-table class='logs' v-loading="table_loading":data="logs" width='100%' >
         <el-table-column type="index" width="50"></el-table-column>      
-        <el-table-column prop="LogTime" label="时间" width='130'></el-table-column>
+        <el-table-column label="记录时间" width='150'>
+          <template slot-scope="scope">
+            <span>{{scope.row.LogTime | parseTime('{y}-{m}-{d} {h}:{i}')}}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="LogUser" label="操作人"></el-table-column>   
         <el-table-column prop="LogDesc" label="描述"></el-table-column>
       </el-table>
@@ -155,16 +161,39 @@ export default {
       curpage: 1,
       page_size: 10,
       total: 0,
-      auth: 0
+      auth: 0,
+      reviewDesc: ['一审','二审','三审']
     }    
   },
   async created() {
     await this.fetchData()
   },
   methods: {
+    async review(auth, row){
+      const resl = await this.$store.dispatch('SetSheetLog', { sheetid: row.SheetID, desc: this.reviewDesc[auth - 1] })
+      console.log(resl)
+      const res = await this.$store.dispatch('ReviewSheet', { sheetid: row.SheetID })
+      console.log(res)
+      this.$notify({
+        title: '成功',
+        message: this.reviewDesc[auth - 1] + '成功',
+        type: 'success',
+        duration: 2000
+      })
+      await this.SearchSheet()
+    },
+    async logNext(auth, row){
+      const res = await this.$store.dispatch('SetSheetLog', { sheetid: row.SheetID, desc: this.reviewDesc[auth - 1]+" -> 下一级审批" })
+      console.log(res)
+      await this.handleCurSheetChange(row)
+    },
     canReview(auth, row){
-       const can = this.auth === auth && !row.reason
-       return can
+      const can = this.auth === auth && !row.reason
+      return can
+    },
+    canNextReview(auth, row){
+      const can = this.auth === auth && row.reason
+      return can
     },
     async fetchData() {
       const auth = await this.$store.dispatch('GetUserReviewAuth')

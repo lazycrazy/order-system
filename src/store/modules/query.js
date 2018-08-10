@@ -12,7 +12,9 @@ import {
   getSheets,
   getSheetDetail,
   getUserReviewAuth,
-  getItemReason
+  getItemReason,
+  setSheetLog,
+  reviewSheet
 } from '@/api/query'
 
 const query = {
@@ -23,7 +25,14 @@ const query = {
   },
 
   actions: {
-    
+    async SetSheetLog({ commit }, data) {
+      const res = await setSheetLog(data)
+      return res.data
+    },
+    async ReviewSheet({ commit }, data) {
+      const res = await reviewSheet(data)
+      return res.data
+    },
     async GetItemReason({ commit }, data) {
       const res = await getItemReason(data)
       return res.data
