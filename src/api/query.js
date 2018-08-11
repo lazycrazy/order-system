@@ -1,5 +1,13 @@
 import request from '@/utils/request'
 
+export function getGoodsIdBySF(data) {
+  return request({
+    url: `/query/goodsIdsBySF`,
+    method: 'post',
+    data
+  })
+}
+
 export function updateItem(data) {
   return request({
     url: `/purchase/updateItemAndLog`,
@@ -7,7 +15,6 @@ export function updateItem(data) {
     data
   })
 }
-
 
 export function reviewSheet(data) {
   return request({

@@ -293,8 +293,12 @@ export default {
           const obj = {shopid: that.curshop, functionid: that.curfunc, multiple: tempData.multiple, num: tempData.num, amt: tempData.amt, limitnum: tempData.day_limit_num, limitamt: tempData.day_limit_amt, iids: null, uids: null}
           //处理选择的商品
           const ids = that.$refs.tree.getCheckedNodes().filter(n=>n.type===6).map(n=> n.id)
-          obj.iids = chunkArray(ids.filter(i=> that.functionSettings.findIndex(fs=> fs.goodsid === i.id) === -1), 1000)
-          obj.uids = chunkArray(ids.filter(i=> that.functionSettings.findIndex(fs=> fs.goodsid === i.id) > -1), 1000)
+          //获取已存在的商品ID 
+          const exIds = await that.$store.dispatch('GetGoodsIdBySF', { shopid: that.curshop, functionid: that.curfunc})
+          console.log(ids)
+          console.log(exIds)
+          obj.iids = chunkArray(ids.filter(i=> exIds.findIndex(fs=> fs.goodsid === i) === -1), 1000)
+          obj.uids = chunkArray(ids.filter(i=> exIds.findIndex(fs=> fs.goodsid === i) > -1), 1000)
           console.log(ids.length)
           console.log(obj.iids.length)
           console.log(obj.uids.length)
