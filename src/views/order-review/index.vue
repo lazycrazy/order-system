@@ -163,6 +163,7 @@ export default {
       total: 0,
       auth: 0,
       reviewDesc: ['一审','二审','三审'],
+      curSheet: null,
       editRow: null
     }    
   },
@@ -189,6 +190,7 @@ export default {
         type: 'success',
         duration: 2000
       })
+      this.curSheet = null
       this.items = []
       this.logs = []
       await this.SearchSheet()
@@ -241,10 +243,12 @@ export default {
       this.$message.success('单据加载完成')           
     },    
     async handleCurSheetChange(curSheet) {
+      this.curSheet = curSheet
       const res = await this.$store.dispatch('GetSheetDetail', { sheetids: [curSheet.SheetID]})
       const items = res[0]
       this.items = items
       this.logs = res[1]
+      this.curSheet.reason = this.items.map(i=>i.reason).toString()
     },
     async handleShopChange(curshop) {
       await this.SearchSheet()     
@@ -265,7 +269,7 @@ export default {
           const obj = {sheetid: that.editRow.SheetID, goodsid: that.editRow.GoodsID,  qty: tempData.num, desc:"编辑" }           
           const res = await that.$store.dispatch('UpdateItem', obj)
           console.log(res)
-          await that.handleCurSheetChange({SheetID: that.editRow.SheetID})
+          await that.handleCurSheetChange(this.curSheet)
           that.dialogFormVisible = false
           that.editRow = null
           that.$notify({
