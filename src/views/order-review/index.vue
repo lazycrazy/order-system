@@ -197,7 +197,6 @@ export default {
     },
     async logNext(auth, row){
       const res = await this.$store.dispatch('SetSheetLog', { sheetid: row.SheetID, desc: this.reviewDesc[auth - 1]+" -> 下一级审批" })
-      console.log(res)
       await this.handleCurSheetChange(row)
     },
     canReview(auth, row){
@@ -233,7 +232,7 @@ export default {
         for(const s of sheets){
           const sr = reasonObj[s.SheetID]
           if(sr) {
-             const r = sr.map(i=>i.reason).join()
+             const r = sr.map(i=>i.reason).filter(i=>i.length>0).join()
              s.reason = r //this.$set(s,'reason', r)
             }
         }
@@ -244,11 +243,18 @@ export default {
     },    
     async handleCurSheetChange(curSheet) {
       this.curSheet = curSheet
-      const res = await this.$store.dispatch('GetSheetDetail', { sheetids: [curSheet.SheetID]})
-      const items = res[0]
-      this.items = items
-      this.logs = res[1]
-      this.curSheet.reason = this.items.map(i=>i.reason).toString()
+      if(curSheet){
+        const res = await this.$store.dispatch('GetSheetDetail', { sheetids: [curSheet.SheetID]})
+        const items = res[0]
+        this.items = items
+        this.logs = res[1]
+        const reason = this.items.map(i=>i.reason).filter(i=>i.length>0).toString()
+        this.$set(this.curSheet, 'reason', reason)
+      }
+      else{
+        this.items = []
+        this.logs = []
+      }
     },
     async handleShopChange(curshop) {
       await this.SearchSheet()     
