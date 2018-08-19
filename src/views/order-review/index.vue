@@ -16,10 +16,18 @@
         <el-table-column  prop="ShopName"   label="店铺" width='190'></el-table-column>     
         <el-table-column   prop="SheetID"  width='160' label="单号"  ></el-table-column>
         <el-table-column   prop="ManageDeptID" label="ManageDeptID" > </el-table-column>
-        <el-table-column   prop="AskType" width='80'  label="AskType"  > </el-table-column>
-        <el-table-column   prop="Flag" width='60' label="Flag"  > </el-table-column>
-        <el-table-column   prop="Editor"  width='80' label="编辑人" >  </el-table-column>
-        <el-table-column   label="编辑时间" >
+        <el-table-column   prop="AskType" width='80'  label="申请单类型"  > 
+            <template slot-scope="scope">
+              {{scope.row.AskType | AskType_Desc}}
+            </template>
+        </el-table-column>
+        <el-table-column  width='60' label="状态"  >
+          <template slot-scope="scope">
+              {{Flag_Desc[scope.row.Flag] || scope.row.Flag}}
+          </template>
+        </el-table-column>
+        <el-table-column   prop="Editor"  width='80' label="制单人" >  </el-table-column>
+        <el-table-column   label="制单日期" >
           <template slot-scope="scope">
             <span>{{scope.row.EditDate | parseTime('{y}-{m}-{d} {h}:{i}')}}</span>
           </template>
@@ -31,7 +39,7 @@
             <el-button size="mini" type="danger" v-if="canNextReview(1, scope.row)" @click="logNext(1, scope.row)">下一级审批</el-button>
             <el-button size="mini" type="danger" v-if="canReview(2, scope.row)" @click="review(2, scope.row)">{{reviewDesc[1]}}</el-button>
             <el-button size="mini" type="danger" v-if="canNextReview(2, scope.row)" @click="logNext(2, scope.row)">下一级审批</el-button>
-            <el-button size="mini" type="danger" v-if="canReview(3, scope.row)" @click="review(3, scope.row)">{{reviewDesc[2]}}</el-button>
+            <el-button size="mini" type="danger" v-if="canReview(3, scope.row)" @click="review3(3, scope.row)">{{reviewDesc[2]}}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -57,7 +65,7 @@
                 <span style="margin-left: 10px">{{ scope.row.goodsname }}</span>
               </template>
             </el-table-column>
-            <el-table-column :key='col' v-for='col in itemcols' :label="col">
+            <el-table-column :key='col' v-for='col in itemcols' :label="itemcols_desc[col]">
                 <template slot-scope="scope">
                   {{scope.row[col]}}
                 </template>
@@ -110,34 +118,32 @@ const itemcols = ['reason','SheetID'
 ,'Cost'
 ,'Price'
 ,'StockQty'
-,'SaleDate'
-,'ReceiptDate'
 ,'PromotionType'
-,'NewFlag'
 ,'Notes'
-,'MonthSaleQty'
-,'LastWeekSaleQty'
 ,'KSDays'
-,'InputGoodsId'
-,'OrdDay'
-,'MakeUpInterval'
-,'DeliverDay'
-,'AdviceQty'
-,'SSQ'
-,'retdcflag'
-,'DeliveryAddr'
-,'SafeInventoryDay'
-,'COV'
-,'CanSaleQty'
-,'OpenTransQty'
-,'LastyearSaleQty'
-,'MakeupDays'
-,'LastTotalSaleQty'
-]
+,'AdviceQty']
+const itemcols_desc = 
+{'reason': '原因'
+,'SheetID': '单号'
+,'serialid': '序号'
+,'GoodsID': '商品ID'
+,'PKNum': '件装数'
+,'Qty': '数量'
+,'PKName': '件数描述'
+,'PKSpec': '件装规格'
+,'BarcodeID': '条码'
+,'Cost': '进价'
+,'Price': '售价'
+,'StockQty': '库存'
+,'PromotionType': '促销类型'
+,'Notes': '备注'
+,'KSDays': '可销天数'
+,'AdviceQty': '建议数'}
+const Flag_Desc = {0:'未审核', 1:'待开始', 2:'待结束', 99:'已取消', 100:'结束'} 
 export default {
   data() {
     return {
-      itemcols,
+      itemcols,Flag_Desc,itemcols_desc,
       sheets: [],
       items: [],
       logs: [],
@@ -167,6 +173,11 @@ export default {
       editRow: null
     }    
   },
+  filters: {
+    AskType_Desc(value) {
+      return value === '0'? '手工': value === '1'? '电脑' : value
+    },
+  },
   async created() {
     await this.fetchData()
   },
@@ -184,6 +195,20 @@ export default {
       console.log(resl)
       const res = await this.$store.dispatch('ReviewSheet', { sheetid: row.SheetID })
       console.log(res)
+      this.$notify({
+        title: '成功',
+        message: this.reviewDesc[auth - 1] + '成功',
+        type: 'success',
+        duration: 2000
+      })
+      this.curSheet = null
+      this.items = []
+      this.logs = []
+      await this.SearchSheet()
+    },
+    async review3(auth, row){
+      const resl = await this.$store.dispatch('SetSheetLog', { sheetid: row.SheetID, desc: this.reviewDesc[auth - 1] })
+      console.log(resl)
       this.$notify({
         title: '成功',
         message: this.reviewDesc[auth - 1] + '成功',
