@@ -105,6 +105,7 @@
 
 <script>
 export default {
+  name: 'orderPropertySetting',
   data() {
     return {
       activeName: 'first',
@@ -116,7 +117,7 @@ export default {
       }
     }
   },
-  async created() {
+  async created() { 
     await this.fetchData()
   },
   methods: {

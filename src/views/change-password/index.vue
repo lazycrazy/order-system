@@ -38,6 +38,7 @@
 
 <script>
 export default {
+  name: 'changePassword',
   data() {
     const validatePassword = (rule, value, callback) => {
       if (value.length < 4) {

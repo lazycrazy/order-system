@@ -55,46 +55,86 @@ export default new Router({
 export const asyncRouterMap = [
   {
     path: '/change-password',
+    name: 'change-password', 
     component: Layout,
-    children: [{ path: 'index', component: () => import('@/views/change-password/index'), name: 'change-password', meta: { title: 'changePassword', icon: 'form' }}]
+    children: [{ 
+      path: 'index', 
+      component: () => import('@/views/change-password/index'), 
+      name: 'changePassword', 
+      meta: { 
+        title: 'changePassword', 
+        icon: 'form' 
+      }}]
   },
   {
     path: '/order-property-setting',
+    name: 'order-property-setting', 
     component: Layout,
     meta: {
       title: 'orderPropertySetting',
       roles: ['admin'],
       sys: ['HQ']
     },
-    children: [{ path: 'index', component: () => import('@/views/order-property-setting/index'), name: 'order-property-setting', meta: { title: 'orderPropertySetting', icon: 'form' }}]
+    children: [{ 
+      path: 'index', 
+      component: () => import('@/views/order-property-setting/index'), 
+      name: 'orderPropertySetting', 
+      meta: { 
+        title: 'orderPropertySetting', 
+        icon: 'form' 
+      }}]
   },
   {
     path: '/role-permission',
+    name: 'role-permission', 
     component: Layout,
     meta: {
       title: 'rolePermission',
       roles: ['admin']
     },
-    children: [{ path: 'index', component: () => import('@/views/role-permission/index'), name: 'role-permission', meta: { title: 'rolePermission', icon: 'form' }}]
+    children: [{ 
+      path: 'index', 
+      component: () => import('@/views/role-permission/index'), 
+      name: 'rolePermission', 
+      meta: { 
+        title: 'rolePermission', 
+        icon: 'form' 
+      }}]
   },
   {
     path: '/function-setting',
+    name: 'function-setting', 
     component: Layout,
     meta: {
       title: 'functionSetting',
       roles: ['admin'],
       sys: ['HQ']
     },
-    children: [{ path: 'index', component: () => import('@/views/function-setting/index'), name: 'functionSetting', meta: { title: 'functionSetting', icon: 'form' }}]
+    children: [{ 
+      path: 'index', 
+      component: () => import('@/views/function-setting/index'), 
+      name: 'functionSetting', 
+      meta: { 
+        title: 'functionSetting', 
+        icon: 'form' 
+      }}]
   },
   {
     path: '/order-review',
+    name: 'order-review', 
     component: Layout,
     meta: {
       title: 'orderReview',
       roles: ['admin']
     },
-    children: [{ path: 'index', component: () => import('@/views/order-review/index'), name: 'orderReview', meta: { title: 'orderReview', icon: 'table' }}]
+    children: [{ 
+      path: 'index', 
+      component: () => import('@/views/order-review/index'), 
+      name: 'orderReview', 
+      meta: { 
+        title: 'orderReview', 
+        icon: 'table' 
+      }}]
   },
   { path: '*', redirect: '/404', hidden: true }
 ]

@@ -136,6 +136,7 @@ import { groupBy, chunkArray } from '@/utils'
 
 
 export default {
+  name: 'functionSetting',
   data() {
     return {
       functionSettings: [],

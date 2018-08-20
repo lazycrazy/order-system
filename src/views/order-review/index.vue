@@ -141,6 +141,7 @@ const itemcols_desc =
 ,'AdviceQty': '建议数'}
 const Flag_Desc = {0:'未审核', 1:'待开始', 2:'待结束', 99:'已取消', 100:'结束'} 
 export default {
+  name: 'orderReview',
   data() {
     return {
       itemcols,Flag_Desc,itemcols_desc,
