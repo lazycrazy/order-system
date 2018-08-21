@@ -16,7 +16,8 @@ import {
   setSheetLog,
   reviewSheet,
   updateItem,
-  getGoodsIdBySF
+  getGoodsIdBySF,
+  getShopServerInfos
 } from '@/api/query'
 
 const query = {
@@ -27,7 +28,10 @@ const query = {
   },
 
   actions: {
-    
+    async GetShopServerInfos({ commit }, ) {
+      const res = await getShopServerInfos()
+      return res.data
+    },
     async GetGoodsIdBySF({ commit }, data) {
       const res = await getGoodsIdBySF(data)
       return res.data

@@ -22,7 +22,8 @@
     </el-table-column>
   </el-table>
 </el-tab-pane>
-    <el-tab-pane label="毛利属性" name="second"><el-table
+    <el-tab-pane label="毛利属性" name="second">
+      <el-table
     :data="propertys.mlsxs"
     style="width: 100%">
      <el-table-column

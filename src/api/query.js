@@ -1,5 +1,12 @@
 import request from '@/utils/request'
 
+export function getShopServerInfos() {
+  return request({
+    url: `/query/shopServerInfo`,
+    method: 'get'
+  })
+}
+
 export function getGoodsIdBySF(data) {
   return request({
     url: `/query/goodsIdsBySF`,

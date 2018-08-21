@@ -16,7 +16,7 @@
       <el-radio-button :label="0">无</el-radio-button>
       <el-radio-button :label="1">一审</el-radio-button>
       <el-radio-button :label="2">二审</el-radio-button>
-      <el-radio-button :label="3" v-if='isHQ'>三审</el-radio-button>
+      <el-radio-button :label="3" v-if='IsHQ'>三审</el-radio-button>
     </el-radio-group>     
       </template>
     </el-table-column>
@@ -33,11 +33,11 @@ export default {
     return {
       activeName: 'first',
       permissions: [],
-      isHQ: false
+      IsHQ: false
     }
   },
   async created() {
-    this.isHQ = process.env.SYS === "HQ"
+    this.IsHQ = process.env.SYS === "HQ"
     await this.fetchData()
   },
   methods: {
