@@ -55,7 +55,8 @@ export default {
   data(){
     return {
       IsHQ: process.env.SYS === "HQ",
-      show: false
+      show: false,
+      timer: null
     }
   },
   components: {
@@ -89,6 +90,7 @@ export default {
       const that = this
       await (async function cycle() {
         // if(that && !that._isDestroyed) {
+          console.log('refresh3Review')
            try{
              const shopInfos = await that.$store.dispatch('GetShopServerInfos')
              that.show = shopInfos.some(s=> s.Need3ReviewCount > 0)
@@ -96,7 +98,8 @@ export default {
              console.log('获取店铺信息列表失败')
              console.log(ex)
            }
-           setTimeout(cycle, 1 * 60 * 1000)
+           clearTimeout(that.timer)
+           that.timer = setTimeout(cycle, 1 * 60 * 1000)
         // }
       })() 
     }

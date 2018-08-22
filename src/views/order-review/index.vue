@@ -29,7 +29,7 @@
         <el-table-column   prop="Editor"  width='80' label="制单人" >  </el-table-column>
         <el-table-column   label="制单日期" >
           <template slot-scope="scope">
-            <span>{{scope.row.EditDate | parseTime('{y}-{m}-{d} {h}:{i}')}}</span>
+            <span>{{new Date(scope.row.EditDate) | parseTime('{y}-{m}-{d} {h}:{i}:{s}')}}</span>
           </template>
         </el-table-column>
         <el-table-column   prop="Operator"  label="操作人" ></el-table-column>
@@ -39,7 +39,7 @@
             <el-button size="mini" type="danger" v-if="canNextReview(1, scope.row)" @click="logNext(1, scope.row)">下一级审批</el-button>
             <el-button size="mini" type="danger" v-if="canReview(2, scope.row)" @click="review(2, scope.row)">{{reviewDesc[1]}}</el-button>
             <el-button size="mini" type="danger" v-if="canNextReview(2, scope.row)" @click="logNext(2, scope.row)">下一级审批</el-button>
-            <el-button size="mini" type="danger" v-if="canReview(3, scope.row)" @click="review3(3, scope.row)">{{reviewDesc[2]}}</el-button>
+            <el-button size="mini" type="danger" v-if="canReview(3, scope.row)" @click="review(3, scope.row)">{{reviewDesc[2]}}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -78,7 +78,7 @@
         <el-table-column type="index" width="50"></el-table-column>      
         <el-table-column label="记录时间" width='150'>
           <template slot-scope="scope">
-            <span>{{scope.row.LogTime | parseTime('{y}-{m}-{d} {h}:{i}')}}</span>
+            <span>{{new Date(scope.row.LogTime) | parseTime('{y}-{m}-{d} {h}:{i}:{s}')}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="LogUser" label="操作人"></el-table-column>   
@@ -193,7 +193,7 @@ export default {
       })
     },
     async review(auth, row){
-      const resl = await this.$store.dispatch('SetSheetLog', { sheetid: row.SheetID, desc: this.reviewDesc[auth - 1] })
+      const resl = await this.$store.dispatch('SetSheetLog', { sheetid: row.SheetID, desc: this.reviewDesc[auth - 1], auth })
       console.log(resl)
       const res = await this.$store.dispatch('ReviewSheet', { sheetid: row.SheetID })
       console.log(res)
@@ -208,22 +208,8 @@ export default {
       this.logs = []
       await this.SearchSheet()
     },
-    async review3(auth, row){
-      const resl = await this.$store.dispatch('SetSheetLog', { sheetid: row.SheetID, desc: this.reviewDesc[auth - 1] })
-      console.log(resl)
-      this.$notify({
-        title: '成功',
-        message: this.reviewDesc[auth - 1] + '成功',
-        type: 'success',
-        duration: 2000
-      })
-      this.curSheet = null
-      this.items = []
-      this.logs = []
-      await this.SearchSheet()
-    },
     async logNext(auth, row){
-      const res = await this.$store.dispatch('SetSheetLog', { sheetid: row.SheetID, desc: this.reviewDesc[auth - 1]+" -> 下一级审批" })
+      const res = await this.$store.dispatch('SetSheetLog', { sheetid: row.SheetID, desc: this.reviewDesc[auth - 1]+" -> 下一级审批", auth: auth + 10 })
       await this.handleCurSheetChange(row)
     },
     canReview(auth, row){
