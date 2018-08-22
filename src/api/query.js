@@ -1,4 +1,13 @@
 import request from '@/utils/request'
+import requestSC from '@/utils/requestSC'
+
+
+export function getShopServerUrl(data) {
+  return request({
+    url: `/query/shopServerUrl/${data.shopid}`,
+    method: 'get'
+  })
+}
 
 export function getShopServerInfos() {
   return request({
@@ -16,6 +25,13 @@ export function getGoodsIdBySF(data) {
 }
 
 export function updateItem(data) {
+  if(data.shopServerUrl){
+    return requestSC(data.shopServerUrl)({
+      url: `/purchase/updateItemAndLog`,
+      method: 'post',
+      data
+    })
+  }
   return request({
     url: `/purchase/updateItemAndLog`,
     method: 'post',
@@ -39,6 +55,13 @@ export function setSheetLog(data) {
   })
 }
 export function getItemReason(data) {
+  if(data.shopServerUrl){
+    return requestSC(data.shopServerUrl)({
+      url: `/purchase/itemReason`,
+      method: 'post',
+      data
+    })
+  }
   return request({
     url: `/purchase/itemReason`,
     method: 'post',
@@ -54,6 +77,13 @@ export function getUserReviewAuth() {
 }
 
 export function getSheetDetail(data) {
+  if(data.shopServerUrl){
+    return requestSC(data.shopServerUrl)({
+      url: `/purchase/itemBySheetIds`,
+      method: 'post',
+      data
+    })
+  }
   return request({
     url: `/purchase/itemBySheetIds`,
     method: 'post',
@@ -62,6 +92,13 @@ export function getSheetDetail(data) {
 }
 
 export function getSheets(data) {
+  if(data.shopServerUrl){
+    return requestSC(data.shopServerUrl)({
+      url: `/purchase/listByShop`,
+      method: 'post',
+      data
+    })
+  }
   return request({
     url: `/purchase/listByShop`,
     method: 'post',
@@ -113,6 +150,14 @@ export function getShop() {
     method: 'get'
   })
 }
+
+export function getCurShop() {
+  return request({
+    url: '/query/curshop',
+    method: 'get'
+  })
+}
+
 
 export function getRolePermission() {
   return request({

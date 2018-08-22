@@ -8,7 +8,7 @@
     style="width: 100%">
      <el-table-column
       label="店铺"
-      width="180">
+      width="230">
       <template slot-scope="scope">
         <span style="margin-left: 10px">{{ scope.row.shopname }}</span>
       </template>
@@ -30,18 +30,14 @@ export default {
       shopInfos: []
     }
   },
-  async created() {
-    if(this.IsHQ){
-      await this.fetchData()
-      setInterval(this.fetchData.bind(this), 2 * 60 * 1000)
-    }
+  async mounted() {
+    await this.fetchData()
   },
   methods: {
     async fetchData() {
-      console.log('timer...')
-      const res = await this.$store.dispatch('GetShopServerInfos')
-      this.shopInfos = res
-    },
+      if(!this.IsHQ) return
+      this.shopInfos = await this.$store.dispatch('GetShopServerInfos')      
+    }     
   },
   computed: {
     ...mapGetters([

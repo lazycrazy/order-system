@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <el-select v-model="curshop" placeholder="请选择店铺" @change="handleShopChange">
+    <el-select v-model="curshop" placeholder="店铺" @change="handleShopChange">
       <el-option
         v-for="item in shops"
         :key="item.value"
@@ -144,6 +144,7 @@ export default {
   name: 'orderReview',
   data() {
     return {
+      IsHQ : process.env.SYS === "HQ",
       itemcols,Flag_Desc,itemcols_desc,
       sheets: [],
       items: [],
@@ -237,22 +238,32 @@ export default {
       const auth = await this.$store.dispatch('GetUserReviewAuth')
       console.log(auth)
       this.auth = auth
-      const res = await this.$store.dispatch('GetShop')
+      const res = await this.$store.dispatch('GetCurShop')
       this.shops = res
       if (this.shops.length > 0) {
         this.curshop = this.shops[0].value
         this.handleShopChange(this.curshop) 
       }
     },
+    async shopServerUrl() {
+      let shopServerUrl = null
+      if(this.IsHQ){
+        const res = await this.$store.dispatch('GetShopServerUrl', {shopid: this.curshop})
+        if(res.length > 0)
+          shopServerUrl = res[0].ServerUrl + '/api'
+      }
+      return shopServerUrl
+    },
     async SearchSheet() {
       if(!this.curshop) return 
+      const shopServerUrl = await this.shopServerUrl()
       this.table_loading = true
-      const res = await this.$store.dispatch('GetSheets', { shopid: this.curshop, curpage: this.curpage || 1 , pagesize: this.page_size || 10 })
+      const res = await this.$store.dispatch('GetSheets', { shopid: this.curshop, curpage: this.curpage || 1 , pagesize: this.page_size || 10, shopServerUrl })
       const sheets = res.fs
       this.total = res.total
       if(sheets.length > 0){
         const sheetids = sheets.map(s=> s. SheetID)
-        const reasons = await this.$store.dispatch('GetItemReason', { sheetids })
+        const reasons = await this.$store.dispatch('GetItemReason', { sheetids, shopServerUrl })
         const reasonObj = groupBy(reasons, 'SheetID')
 
         for(const s of sheets){
@@ -269,8 +280,9 @@ export default {
     },    
     async handleCurSheetChange(curSheet) {
       this.curSheet = curSheet
+      const shopServerUrl = await this.shopServerUrl()
       if(curSheet){
-        const res = await this.$store.dispatch('GetSheetDetail', { sheetids: [curSheet.SheetID]})
+        const res = await this.$store.dispatch('GetSheetDetail', { shopServerUrl, sheetids: [curSheet.SheetID]})
         const items = res[0]
         this.items = items
         this.logs = res[1]
@@ -297,8 +309,9 @@ export default {
       const that = this
       this.$refs['dataForm'].validate(async (valid) => {
         if (valid) {
+          const shopServerUrl = await that.shopServerUrl()
           const tempData = Object.assign({}, that.temp)
-          const obj = {sheetid: that.editRow.SheetID, goodsid: that.editRow.GoodsID,  qty: tempData.num, desc:"编辑" }           
+          const obj = {sheetid: that.editRow.SheetID, goodsid: that.editRow.GoodsID,  qty: tempData.num, desc:"编辑", shopServerUrl }           
           const res = await that.$store.dispatch('UpdateItem', obj)
           console.log(res)
           await that.handleCurSheetChange(this.curSheet)

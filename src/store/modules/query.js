@@ -4,6 +4,7 @@ import {
   getRolePermission, 
   setRolePermission, 
   getShop, 
+  getCurShop, 
   getShopGoods,
   getFunctionSetting,
   setFunctionSetting,
@@ -17,7 +18,8 @@ import {
   reviewSheet,
   updateItem,
   getGoodsIdBySF,
-  getShopServerInfos
+  getShopServerInfos,
+  getShopServerUrl
 } from '@/api/query'
 
 const query = {
@@ -27,7 +29,11 @@ const query = {
   mutations: {
   },
 
-  actions: {
+  actions: {    
+    async GetShopServerUrl({ commit }, data) {
+      const res = await getShopServerUrl(data)
+      return res.data
+    },
     async GetShopServerInfos({ commit }, ) {
       const res = await getShopServerInfos()
       return res.data
@@ -106,7 +112,16 @@ const query = {
         })
       })
     },
-
+  GetCurShop({ commit }) {
+      return new Promise((resolve, reject) => {
+        getCurShop().then(response => {
+          const data = response.data
+          resolve(data)
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
     GetRolePermission({ commit }) {
       return new Promise((resolve, reject) => {
         getRolePermission().then(response => {

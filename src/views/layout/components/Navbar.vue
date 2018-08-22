@@ -6,7 +6,12 @@
 
     <div class="right-menu">
       <error-log class="errLog-container right-menu-item"></error-log>
-
+      <!-- <div>
+      <el-badge :value="200" :max="99" class="item">
+        <el-button size="small">需三审单</el-button>
+      </el-badge>
+      </div> -->
+      <el-alert :closable="false" v-if='IsHQ && show' title="有三审单据" type="error" class='item'> </el-alert>
       <el-tooltip effect="dark" :content="$t('navbar.screenfull')" placement="bottom">
         <screenfull class="screenfull right-menu-item"></screenfull>
       </el-tooltip>
@@ -47,6 +52,12 @@ import LangSelect from '@/components/LangSelect'
 import ThemePicker from '@/components/ThemePicker'
 
 export default {
+  data(){
+    return {
+      IsHQ: process.env.SYS === "HQ",
+      show: false
+    }
+  },
   components: {
     Breadcrumb,
     Hamburger,
@@ -62,6 +73,9 @@ export default {
       'avatar'
     ])
   },
+  created(){
+    this.refresh3Review()
+  },
   methods: {
     toggleSideBar() {
       this.$store.dispatch('toggleSideBar')
@@ -70,6 +84,21 @@ export default {
       this.$store.dispatch('LogOut').then(() => {
         location.reload()// In order to re-instantiate the vue-router object to avoid bugs
       })
+    },
+    async refresh3Review() {
+      const that = this
+      await (async function cycle() {
+        // if(that && !that._isDestroyed) {
+           try{
+             const shopInfos = await that.$store.dispatch('GetShopServerInfos')
+             that.show = shopInfos.some(s=> s.Need3ReviewCount > 0)
+           }catch(ex){
+             console.log('获取店铺信息列表失败')
+             console.log(ex)
+           }
+           setTimeout(cycle, 1 * 60 * 1000)
+        // }
+      })() 
     }
   }
 }
@@ -98,6 +127,10 @@ export default {
     height: 100%;
     &:focus{
      outline: none;
+    }
+    .item {
+      display: inline;
+      top: -30%;
     }
     .right-menu-item {
       display: inline-block;
