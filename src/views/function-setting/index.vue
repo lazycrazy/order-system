@@ -10,8 +10,11 @@
     </el-option>
   </el-select>
   <el-button type="primary" @click.native.prevent="dialogSelectShopVisible=true">复制应用到它店</el-button>
+  <label  v-if='IsHQ' class='import'>
+    <input ref='import' type="file" @change="fsImport1" accept=".csv" v-show='false'/>
+    导入
+  </label>
 
- 
 <div class='content'>
   <div class='left'>
     <div class='header'>
@@ -139,6 +142,7 @@ export default {
   name: 'functionSetting',
   data() {
     return {
+      IsHQ : process.env.SYS === "HQ",
       functionSettings: [],
       shops: [], 
       checkShops: [],
@@ -176,6 +180,32 @@ export default {
     await this.fetchData()
   },
   methods: {
+    fsImport1(e) {
+      const self = this 
+      const file = e.target.files[0]
+      const reader = new FileReader()
+      reader.onload =  async (e) => {
+          const data = e.target.result
+          const rows = data.split(/\r?\n/).filter(r=>r.trim().length > 0)
+          rows.shift()
+          const srows = rows.map(r => {
+            const strs = r.split(',')
+            const o = strs.reduce((acc, cur, i) => { 
+              acc['Col'+(i+1)] = cur
+              return acc
+              },{})
+            return o
+          })
+          console.log(srows)
+          //发送到服务端
+         const res = await self.$store.dispatch('FunctionSettingImport', { data: srows}) 
+          console.log(res)
+          self.$message.success(`更新：${res[0]}条，新增：${res[1]}条`)
+      }
+      reader.readAsText(file)    
+
+      this.$refs['import'].value = null
+    },
     async fetchData() {
       const res = await this.$store.dispatch('GetShop')
       this.shops = res
@@ -334,6 +364,14 @@ $light_gray:#fff;
   border:2px solid beige;
   border-radius: 1px;
   padding: 10px;
+  .import {
+    padding: 10px 20px;
+    font-weight: 500;
+    border:2px solid grey;
+    border-radius: 4px;
+    font-size: 14px;
+    color: grey;
+  }
   .content{
     border:2px solid beige;
     border-radius: 1px;

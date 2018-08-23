@@ -1,6 +1,13 @@
 import request from '@/utils/request'
 import requestSC from '@/utils/requestSC'
 
+export function functionSettingImport(data) {
+  return request({
+    url: `/set/functionSettingImport`,
+    method: 'post',
+    data
+  })
+}
 
 export function getShopServerUrl(data) {
   return request({

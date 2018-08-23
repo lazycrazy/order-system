@@ -19,7 +19,8 @@ import {
   updateItem,
   getGoodsIdBySF,
   getShopServerInfos,
-  getShopServerUrl
+  getShopServerUrl,
+  functionSettingImport
 } from '@/api/query'
 
 const query = {
@@ -40,6 +41,10 @@ const query = {
     },
     async GetGoodsIdBySF({ commit }, data) {
       const res = await getGoodsIdBySF(data)
+      return res.data
+    },
+    async FunctionSettingImport({ commit }, data){
+      const res = await functionSettingImport(data)
       return res.data
     },
     async UpdateItem({ commit }, data) {
