@@ -1,6 +1,13 @@
 import request from '@/utils/request'
 import requestSC from '@/utils/requestSC'
 
+export function getShopTypes() {
+  return request({
+    url: `/query/shopTypes`,
+    method: 'get'
+  })
+}
+
 export function functionSettingImport(data) {
   return request({
     url: `/set/functionSettingImport`,
@@ -181,10 +188,11 @@ export function setRolePermission(data) {
   })
 }
 
-export function getOrderProperty() {
+export function getOrderProperty(data) {
   return request({
-    url: '/query/orderProperty',
-    method: 'get'
+    url: `/query/orderProperty`,
+    method: 'post',
+    data
   })
 }
 

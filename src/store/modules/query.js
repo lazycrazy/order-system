@@ -20,7 +20,8 @@ import {
   getGoodsIdBySF,
   getShopServerInfos,
   getShopServerUrl,
-  functionSettingImport
+  functionSettingImport,
+  getShopTypes
 } from '@/api/query'
 
 const query = {
@@ -31,6 +32,11 @@ const query = {
   },
 
   actions: {    
+    
+    async GetShopTypes({ commit }) {
+      const res = await getShopTypes()
+      return res.data
+    },
     async GetShopServerUrl({ commit }, data) {
       const res = await getShopServerUrl(data)
       return res.data
@@ -143,15 +149,9 @@ const query = {
     },
 
     // 用户名登录
-    GetOrderProperty({ commit }) {
-      return new Promise((resolve, reject) => {
-        getOrderProperty().then(response => {
-          const data = response.data
-          resolve(data)
-        }).catch(error => {
-          reject(error)
-        })
-      })
+    async GetOrderProperty({ commit }, data) {
+      const res = await getOrderProperty(data)
+      return res.data
     },
     async SetOrderProperty({ commit }, orderProperty) {
       const res = await setOrderProperty(orderProperty)
