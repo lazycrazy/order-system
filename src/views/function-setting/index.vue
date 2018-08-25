@@ -1,12 +1,12 @@
 <template>
   <div class="container">
  
-    <el-select v-model="curshop" placeholder="请选择店铺" @change="handleShopChange">
+    <el-select v-model="curshop"  style="width:300px"  placeholder="请选择店铺" @change="handleShopChange">
     <el-option
       v-for="item in allShops"
       :key="item.shopid"
       :label="item.shopid+' - '+item.shopname"
-      :value="item.shopname">
+      :value="item.shopid">
     </el-option>
   </el-select>
   <el-button type="primary" @click.native.prevent="dialogSelectShopVisible=true">复制应用到它店</el-button>
@@ -234,9 +234,10 @@ export default {
       this.type_shops = type_shops
       this.allShops = this.type_shops.filter((s, i, arr) => {
         return  arr.findIndex(f=> f.shopid == s.shopid ) === i
-      })
+       }).sort((a,b)=>(a.shopid > b.shopid) ? 1 : ((b.shopid > a.shopid) ? -1 : 0)) 
+
       if (this.allShops.length > 0) {
-        this.curshop = this.allShops[0].value
+        this.curshop = this.allShops[0].shopid
         this.handleShopChange(this.curshop) 
       }
     },

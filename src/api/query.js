@@ -54,6 +54,13 @@ export function updateItem(data) {
 }
 
 export function reviewSheet(data) {
+  if(data.shopServerUrl){
+    return requestSC(data.shopServerUrl)({
+      url: `/purchase/review`,
+      method: 'post',
+      data
+    })
+  }
   return request({
     url: `/purchase/review`,
     method: 'post',
@@ -62,6 +69,13 @@ export function reviewSheet(data) {
 }
 
 export function setSheetLog(data) {
+  if(data.shopServerUrl){
+    return requestSC(data.shopServerUrl)({
+      url: `/purchase/sheetLog`,
+      method: 'post',
+      data
+    })
+  }
   return request({
     url: `/purchase/sheetLog`,
     method: 'post',

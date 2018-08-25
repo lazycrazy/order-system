@@ -74,8 +74,9 @@ export default {
       'avatar'
     ])
   },
-  created(){
-    this.refresh3Review()
+  async created(){
+    if(this.IsHQ)
+      await this.refresh3Review()
   },
   methods: {
     toggleSideBar() {

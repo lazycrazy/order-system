@@ -300,50 +300,50 @@ export default {
     shopTypes () {
       return this.type_shops.filter(function (s, i, arr) {
         return  arr.findIndex(f=> f.shoptypeid == s.shoptypeid && f.shoptypename.trim() == s.shoptypename.trim() ) === i
-      })
+      }).sort((a,b)=> (a.shopid > b.shopid) ? 1 : ((b.shopid > a.shopid) ? -1 : 0))
     },
     shops () {
-      return this.type_shops.filter(f=> this.selectedTypes.includes(f.shoptypeid))
+      return this.type_shops.filter(f=> this.selectedTypes.includes(f.shoptypeid)).sort((a,b)=> (a.shopid > b.shopid) ? 1 : ((b.shopid > a.shopid) ? -1 : 0))
     },
     shops1() {
       return this.propertys.shops.filter((s, i, arr) => {
         return  arr.findIndex(f=> f.shopid == s.shopid ) === i
-      })
+      }).sort((a,b)=> (a.shopid > b.shopid) ? 1 : ((b.shopid > a.shopid) ? -1 : 0))
     },
     shops2 () {
       return this.propertys.mlsxs.filter((s, i, arr) => {
         return  arr.findIndex(f=> f.shopid == s.shopid ) === i
-      })
+      }).sort((a,b)=> (a.shopid > b.shopid) ? 1 : ((b.shopid > a.shopid) ? -1 : 0))
     },
     mlsxs () {
       return this.propertys.mlsxs.filter((s, i, arr) => {
         return  arr.findIndex(f=> f.sxid == s.sxid ) === i
-      })
+      }).sort((a,b)=> (a.sxid > b.sxid) ? 1 : ((b.sxid > a.sxid) ? -1 : 0))
     },
     shops3 () {
       return this.propertys.xssxs.filter((s, i, arr) => {
         return  arr.findIndex(f=> f.shopid == s.shopid ) === i
-      })
+      }).sort((a,b)=> (a.shopid > b.shopid) ? 1 : ((b.shopid > a.shopid) ? -1 : 0))
     },
     xssxs () {
       return this.propertys.xssxs.filter((s, i, arr) => {
         return  arr.findIndex(f=> f.sxid == s.sxid ) === i
-      })
+      }).sort((a,b)=> (a.sxid > b.sxid) ? 1 : ((b.sxid > a.sxid) ? -1 : 0))
     },
     shops4 () {
       return this.propertys.pldxzs.filter((s, i, arr) => {
         return  arr.findIndex(f=> f.shopid == s.shopid ) === i
-      })
+      }).sort((a,b)=> (a.shopid > b.shopid) ? 1 : ((b.shopid > a.shopid) ? -1 : 0))
     },
     depts () {
       return this.propertys.pldxzs.filter((s, i, arr) => {
         return  arr.findIndex(f=> f.deptid == s.deptid ) === i
-      })
+      }).sort((a,b)=> (a.deptid > b.deptid) ? 1 : ((b.deptid > a.deptid) ? -1 : 0))
     },
     skuTypes () {
       return this.propertys.pldxzs.filter((s, i, arr) => {
         return  arr.findIndex(f=> f.skutype == s.skutype ) === i
-      })
+      }).sort((a,b)=> (a.skutype > b.skutype) ? 1 : ((b.skutype > a.skutype) ? -1 : 0))
     }
   },
   async created() { 

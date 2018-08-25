@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <el-select v-model="curshop" placeholder="店铺" @change="handleShopChange">
+    <el-select v-model="curshop" style="width:300px" placeholder="店铺" @change="handleShopChange">
       <el-option
         v-for="item in shops"
         :key="item.value"
@@ -172,7 +172,8 @@ export default {
       auth: 0,
       reviewDesc: ['一审','二审','三审'],
       curSheet: null,
-      editRow: null
+      editRow: null,
+      shopServerUrl: ''
     }    
   },
   filters: {
@@ -193,9 +194,9 @@ export default {
       })
     },
     async review(auth, row){
-      const resl = await this.$store.dispatch('SetSheetLog', { sheetid: row.SheetID, desc: this.reviewDesc[auth - 1], auth })
+      const resl = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: this.reviewDesc[auth - 1], auth })
       console.log(resl)
-      const res = await this.$store.dispatch('ReviewSheet', { sheetid: row.SheetID })
+      const res = await this.$store.dispatch('ReviewSheet', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID })
       console.log(res)
       this.$notify({
         title: '成功',
@@ -209,7 +210,7 @@ export default {
       await this.SearchSheet()
     },
     async logNext(auth, row){
-      const res = await this.$store.dispatch('SetSheetLog', { sheetid: row.SheetID, desc: this.reviewDesc[auth - 1]+" -> 下一级审批", auth: auth + 10 })
+      const res = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: this.reviewDesc[auth - 1]+" -> 下一级审批", auth: auth + 10 })
       await this.handleCurSheetChange(row)
     },
     canReview(auth, row){
@@ -225,31 +226,30 @@ export default {
       console.log(auth)
       this.auth = auth
       const res = await this.$store.dispatch('GetCurShop')
-      this.shops = res
+      this.shops = res.sort((a,b)=>(a.value>b.value?1:(b.value >a.value? -1 : 0)))
       if (this.shops.length > 0) {
         this.curshop = this.shops[0].value
         this.handleShopChange(this.curshop) 
       }
     },
-    async shopServerUrl() {
-      let shopServerUrl = null
+    async getShopServerUrl() {
+      let shopServerUrl = ''
       if(this.IsHQ){
         const res = await this.$store.dispatch('GetShopServerUrl', {shopid: this.curshop})
         if(res.length > 0)
-          shopServerUrl = res[0].ServerUrl + '/api'
+          shopServerUrl = res[0].ServerUrl
       }
       return shopServerUrl
     },
     async SearchSheet() {
-      if(!this.curshop) return 
-      const shopServerUrl = await this.shopServerUrl()
+      if(!this.curshop) return       
       this.table_loading = true
-      const res = await this.$store.dispatch('GetSheets', { shopid: this.curshop, curpage: this.curpage || 1 , pagesize: this.page_size || 10, shopServerUrl })
+      const res = await this.$store.dispatch('GetSheets', { shopid: this.curshop, curpage: this.curpage || 1 , pagesize: this.page_size || 10, shopServerUrl: this.shopServerUrl })
       const sheets = res.fs
       this.total = res.total
       if(sheets.length > 0){
         const sheetids = sheets.map(s=> s. SheetID)
-        const reasons = await this.$store.dispatch('GetItemReason', { sheetids, shopServerUrl })
+        const reasons = await this.$store.dispatch('GetItemReason', { sheetids, shopServerUrl: this.shopServerUrl })
         const reasonObj = groupBy(reasons, 'SheetID')
 
         for(const s of sheets){
@@ -266,9 +266,8 @@ export default {
     },    
     async handleCurSheetChange(curSheet) {
       this.curSheet = curSheet
-      const shopServerUrl = await this.shopServerUrl()
       if(curSheet){
-        const res = await this.$store.dispatch('GetSheetDetail', { shopServerUrl, sheetids: [curSheet.SheetID]})
+        const res = await this.$store.dispatch('GetSheetDetail', { shopServerUrl: this.shopServerUrl, sheetids: [curSheet.SheetID]})
         const items = res[0]
         this.items = items
         this.logs = res[1]
@@ -281,6 +280,16 @@ export default {
       }
     },
     async handleShopChange(curshop) {
+      this.shopServerUrl = ''
+      this.sheets = []
+      this.items = []
+      this.logs = []
+      const shopServerUrl = await this.getShopServerUrl()
+      if(this.IsHQ && !shopServerUrl){
+        this.$message.error('所选店铺没有配置店铺服务URL地址')
+        return
+      }
+      this.shopServerUrl = shopServerUrl + '/api'
       await this.SearchSheet()     
     },
     handleSizeChange(val) {
@@ -295,9 +304,8 @@ export default {
       const that = this
       this.$refs['dataForm'].validate(async (valid) => {
         if (valid) {
-          const shopServerUrl = await that.shopServerUrl()
           const tempData = Object.assign({}, that.temp)
-          const obj = {sheetid: that.editRow.SheetID, goodsid: that.editRow.GoodsID,  qty: tempData.num, desc:"编辑", shopServerUrl }           
+          const obj = {sheetid: that.editRow.SheetID, goodsid: that.editRow.GoodsID,  qty: tempData.num, desc:"编辑", shopServerUrl: that.shopServerUrl }           
           const res = await that.$store.dispatch('UpdateItem', obj)
           console.log(res)
           await that.handleCurSheetChange(this.curSheet)
