@@ -3,10 +3,10 @@
  
     <el-select v-model="curshop" placeholder="请选择店铺" @change="handleShopChange">
     <el-option
-      v-for="item in shops"
-      :key="item.value"
-      :label="item.label"
-      :value="item.value">
+      v-for="item in allShops"
+      :key="item.shopid"
+      :label="item.shopid+' - '+item.shopname"
+      :value="item.shopname">
     </el-option>
   </el-select>
   <el-button type="primary" @click.native.prevent="dialogSelectShopVisible=true">复制应用到它店</el-button>
@@ -50,9 +50,11 @@
         <span style="margin-left: 10px">{{ scope.row.goodsname }}</span>
       </template>
     </el-table-column>
-      <el-table-column
-        prop="deptname"
-        label="小类" width='130'>
+      <el-table-column 
+        label="小类" width='230'>
+         <template slot-scope="scope">
+        <span style="margin-left: 10px">{{ scope.row.DeptId +' - ' + scope.row.deptname }}</span>
+       </template>
       </el-table-column>
       <el-table-column
       prop="ordermultiple"
@@ -122,8 +124,17 @@
 
   <el-dialog title="选择应用同样设置的店" :visible.sync="dialogSelectShopVisible"  width="30%">
        
+          店型组：
+          <el-select v-model="selectedTypes" style="width: 210px;" collapse-tags multiple placeholder="请选择">
+              <el-option
+                v-for="item in shopTypes"
+                :key="item.shoptypeid"
+                :label="item.shoptypeid + ' - ' + item.shoptypename"
+                :value="item.shoptypeid">
+              </el-option>
+          </el-select>
           <el-checkbox-group v-model="checkShops" class='checkgroup'>
-           <el-checkbox v-for="s in shops" :label="s.value" :key="s.value" :disabled="curshop === s.value" border>{{s.label}}</el-checkbox>
+           <el-checkbox v-for="s in shops" :label="s.shopname" :key="s.shopid" :disabled="curshop === s.shopid" border>{{s.shopid+' - '+s.shopname}}</el-checkbox>
           </el-checkbox-group>
         
       <div slot="footer" class="dialog-footer">
@@ -143,8 +154,10 @@ export default {
   data() {
     return {
       IsHQ : process.env.SYS === "HQ",
+      selectedTypes: [],
+      allShops: [],
+      type_shops: [],
       functionSettings: [],
-      shops: [], 
       checkShops: [],
       curshop: null,
       curfunc: 1,
@@ -176,6 +189,16 @@ export default {
       total: 0
     }    
   },
+  computed: {
+    shopTypes () {
+      return this.type_shops.filter(function (s, i, arr) {
+        return  arr.findIndex(f=> f.shoptypeid == s.shoptypeid && f.shoptypename.trim() == s.shoptypename.trim() ) === i
+      })
+    },
+    shops () {
+      return this.type_shops.filter(f=> this.selectedTypes.includes(f.shoptypeid) && f.shopid !== this.curshop)
+    },
+  },
   async created() {
     await this.fetchData()
   },
@@ -206,11 +229,14 @@ export default {
 
       this.$refs['import'].value = null
     },
-    async fetchData() {
-      const res = await this.$store.dispatch('GetShop')
-      this.shops = res
-      if (this.shops.length > 0) {
-        this.curshop = this.shops[0].value
+    async fetchData() { 
+      const type_shops = await this.$store.dispatch('GetShopTypes')
+      this.type_shops = type_shops
+      this.allShops = this.type_shops.filter((s, i, arr) => {
+        return  arr.findIndex(f=> f.shopid == s.shopid ) === i
+      })
+      if (this.allShops.length > 0) {
+        this.curshop = this.allShops[0].value
         this.handleShopChange(this.curshop) 
       }
     },

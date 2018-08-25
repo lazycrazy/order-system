@@ -27,14 +27,14 @@
   </div>
 
     <el-tabs v-model="activeName" class="tab">
-      <el-tab-pane label="店铺" name="first">
+      <el-tab-pane label="店铺" name="1">
         <el-select 
-        v-model="selectedShopsfirst"
+        v-model="selectedShops1"
         multiple collapse-tags
         style="margin-left: 20px;width: 300px;" 
         placeholder="请选择">
           <el-option
-            v-for="item in shopsfirst"
+            v-for="item in shops1"
             :key="item.shopid"
             :label="item.shopid + ' - '+ item.shopname"
             :value="item.shopid">
@@ -42,7 +42,7 @@
         </el-select>
 
         <el-switch
-          v-model='allowOrderfirst'
+          v-model='allowOrder1'
           active-text="可订"
           inactive-text="不可订" @change="handleSwitchTab">
         </el-switch>        
@@ -68,14 +68,14 @@
           </el-table-column>
         </el-table>
       </el-tab-pane>
-      <el-tab-pane label="毛利属性" name="second">
+      <el-tab-pane label="毛利属性" name="2">
         <el-select 
-        v-model="selectedShopssecond"
+        v-model="selectedShops2"
         multiple collapse-tags
         style="margin-left: 20px;width: 300px;" 
         placeholder="请选择">
           <el-option
-            v-for="item in shopssecond"
+            v-for="item in shops2"
             :key="item.shopid"
             :label="item.shopid + ' - '+ item.shopname"
             :value="item.shopid">
@@ -94,7 +94,7 @@
           </el-option>
         </el-select>
         <el-switch
-          v-model='allowOrdersecond'
+          v-model='allowOrder2'
           active-text="可订"
           inactive-text="不可订" @change="handleSwitchTab">
         </el-switch>
@@ -127,14 +127,14 @@
             </el-table-column>
           </el-table>
       </el-tab-pane>
-      <el-tab-pane label="销售属性" name="third">
+      <el-tab-pane label="销售属性" name="3">
         <el-select 
-        v-model="selectedShopsthird"
+        v-model="selectedShops3"
         multiple collapse-tags
         style="margin-left: 20px;width: 300px;" 
         placeholder="请选择">
           <el-option
-            v-for="item in shopsthird"
+            v-for="item in shops3"
             :key="item.shopid"
             :label="item.shopid + ' - '+ item.shopname"
             :value="item.shopid">
@@ -153,7 +153,7 @@
           </el-option>
         </el-select>
         <el-switch
-          v-model='allowOrderthird'
+          v-model='allowOrder3'
           active-text="可订"
           inactive-text="不可订" @change="handleSwitchTab">
         </el-switch>
@@ -185,14 +185,14 @@
             </el-table-column>
         </el-table>
       </el-tab-pane>
-      <el-tab-pane label="品类店型组" name="fourth">
+      <el-tab-pane label="品类店型组" name="4">
         <el-select 
-        v-model="selectedShopsfourth"
+        v-model="selectedShops4"
         multiple collapse-tags
         style="margin-left: 20px;width: 300px;" 
         placeholder="请选择">
           <el-option
-            v-for="item in shopsfourth"
+            v-for="item in shops4"
             :key="item.shopid"
             :label="item.shopid + ' - '+ item.shopname"
             :value="item.shopid">
@@ -223,7 +223,7 @@
           </el-option>
         </el-select>
         <el-switch
-          v-model='allowOrderfourth'
+          v-model='allowOrder4'
           active-text="可订"
           inactive-text="不可订" @change="handleSwitchTab">
         </el-switch>
@@ -242,7 +242,7 @@
             label="小类"
             width="180">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.deptname }}</span>
+              <span style="margin-left: 10px">{{ scope.row.deptid + ' - ' + scope.row.deptname }}</span>
             </template>
           </el-table-column>
           <el-table-column
@@ -272,27 +272,27 @@ export default {
   name: 'orderPropertySetting',
   data() {
     return {
-      allowOrderfirst: false,
-      allowOrdersecond: false,
-      allowOrderthird: false,
-      allowOrderfourth: false,
+      allowOrder1: false,
+      allowOrder2: false,
+      allowOrder3: false,
+      allowOrder4: false,
       type_shops: [],
       selectedTypes: [],
       selectedShops: [],
-      selectedShopsfirst: [],
-      selectedShopssecond: [],
-      selectedShopsthird: [],
-      selectedShopsfourth: [],
+      selectedShops1: [],
+      selectedShops2: [],
+      selectedShops3: [],
+      selectedShops4: [],
       selectedMLSXs: [],
       selectedXSSXs: [],
       selectedDepts: [],
       selectedSkuTypes: [],
-      activeName: 'first',
+      activeName: '1',
       propertys: {
-        mlsxs: [],
-        pldxzs: [],
         shops: [],
-        xssxs: []
+        mlsxs: [],
+        xssxs: [],
+        pldxzs: []
       }
     }
   },
@@ -305,12 +305,12 @@ export default {
     shops () {
       return this.type_shops.filter(f=> this.selectedTypes.includes(f.shoptypeid))
     },
-    shopsfirst() {
+    shops1() {
       return this.propertys.shops.filter((s, i, arr) => {
         return  arr.findIndex(f=> f.shopid == s.shopid ) === i
       })
     },
-    shopssecond () {
+    shops2 () {
       return this.propertys.mlsxs.filter((s, i, arr) => {
         return  arr.findIndex(f=> f.shopid == s.shopid ) === i
       })
@@ -320,7 +320,7 @@ export default {
         return  arr.findIndex(f=> f.sxid == s.sxid ) === i
       })
     },
-    shopsthird () {
+    shops3 () {
       return this.propertys.xssxs.filter((s, i, arr) => {
         return  arr.findIndex(f=> f.shopid == s.shopid ) === i
       })
@@ -330,7 +330,7 @@ export default {
         return  arr.findIndex(f=> f.sxid == s.sxid ) === i
       })
     },
-    shopsfourth () {
+    shops4 () {
       return this.propertys.pldxzs.filter((s, i, arr) => {
         return  arr.findIndex(f=> f.shopid == s.shopid ) === i
       })
@@ -368,31 +368,65 @@ export default {
     async loadTypeAndShops() {
       //获取店型组
       const type_shops = await this.$store.dispatch('GetShopTypes')
-      console.log(type_shops)
       this.type_shops = type_shops
       
     },
     async handleSwitch(row) {
       try {
-        await this.$store.dispatch('SetOrderProperty', Object.assign({}, row))
+        const data = { type: parseInt(this.activeName), rows: [row] }
+        console.log(data)
+        await this.$store.dispatch('SetOrderProperty', data)
         row.isnew = false
         this.$message.success('设置成功')
       } catch (err) {
         row.allowOrder = !row.allowOrder
-        this.$message.error('设置失败')
+        this.$message.error('设置失败'+err.message)
       }
     },
-    async handleSwitchTab(index) {
+    async handleSwitchTab() {
+      
+        let saveRows = Object.values(this.propertys)[parseInt(this.activeName)-1]
+        const sshop = this['selectedShops'+this.activeName]
+        if(sshop.length > 0)
+          saveRows = saveRows.filter(f=> sshop.includes(f.shopid))
+        switch(this.activeName)
+        {
+          case '1':
+            break
+          case '2':
+            if(this.selectedMLSXs.length > 0)
+              saveRows = saveRows.filter(f=> this.selectedMLSXs.includes(f.sxid))
+            break
+           case '3':
+            if(this.selectedXSSXs.length > 0)
+              saveRows = saveRows.filter(f=> this.selectedXSSXs.includes(f.sxid))
+            break
+           case '4':
+            if(this.selectedDepts.length > 0)
+              saveRows = saveRows.filter(f=> this.selectedDepts.includes(f.deptid))
+            if(this.selectedSkuTypes.length > 0)
+              saveRows = saveRows.filter(f=> this.selectedSkuTypes.includes(f.skutype))
+            break
+          default:
+            break
+        }
+        if(saveRows.length === 0){
+          this.$message.error('没有需要保存的数据')
+          return
+        } 
       try {
-        console.log(arguments)
-        // await this.$store.dispatch('SetOrderProperty', Object.assign({}, row))
-        // row.isnew = false
+        for (const r of saveRows)
+          r.allowOrder = this['allowOrder' + this.activeName]
+
+        const data = { type: parseInt(this.activeName), rows: saveRows }
+        await this.$store.dispatch('SetOrderProperty', data)
+        
         this.$message.success('设置成功')
       } catch (err) {
         
-        this.$message.error('设置失败')
-      }finally {
-
+        this.$message.error('设置失败'+err.message)
+      } finally {
+        await this.select()
       }
     },
     onCancel() {

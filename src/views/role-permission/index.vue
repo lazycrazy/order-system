@@ -14,8 +14,8 @@
       <template slot-scope="scope">
         <el-radio-group v-model="scope.row.auth" @change="handleChange(scope.row)">
       <el-radio-button :label="0">无</el-radio-button>
-      <el-radio-button :label="1">一审</el-radio-button>
-      <el-radio-button :label="2">二审</el-radio-button>
+      <el-radio-button :label="1" v-if='!IsHQ'>一审</el-radio-button>
+      <el-radio-button :label="2" v-if='!IsHQ'>二审</el-radio-button>
       <el-radio-button :label="3" v-if='IsHQ'>三审</el-radio-button>
     </el-radio-group>     
       </template>
