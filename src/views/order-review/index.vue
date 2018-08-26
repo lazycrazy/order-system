@@ -182,6 +182,7 @@ export default {
     },
   },
   async created() {
+    console.log(process.env.SYS)
     await this.fetchData()
   },
   methods: {
@@ -210,7 +211,7 @@ export default {
       await this.SearchSheet()
     },
     async logNext(auth, row){
-      const res = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: this.reviewDesc[auth - 1]+" -> 下一级审批", auth: auth + 10 })
+      const res = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: this.reviewDesc[auth - 1]+" -> 下一级审批", auth: -(auth + 10) })
       await this.handleCurSheetChange(row)
     },
     canReview(auth, row){
@@ -244,12 +245,12 @@ export default {
     async SearchSheet() {
       if(!this.curshop) return       
       this.table_loading = true
-      const res = await this.$store.dispatch('GetSheets', { shopid: this.curshop, curpage: this.curpage || 1 , pagesize: this.page_size || 10, shopServerUrl: this.shopServerUrl })
+      const res = await this.$store.dispatch('GetSheets', { shopid: this.curshop, auth: this.auth, curpage: this.curpage || 1 , pagesize: this.page_size || 10, shopServerUrl: this.shopServerUrl })
       const sheets = res.fs
       this.total = res.total
       if(sheets.length > 0){
         const sheetids = sheets.map(s=> s. SheetID)
-        const reasons = await this.$store.dispatch('GetItemReason', { sheetids, shopServerUrl: this.shopServerUrl })
+        const reasons = await this.$store.dispatch('GetItemReason', { sheetids, auth: this.auth, shopServerUrl: this.shopServerUrl })
         const reasonObj = groupBy(reasons, 'SheetID')
 
         for(const s of sheets){
@@ -267,7 +268,7 @@ export default {
     async handleCurSheetChange(curSheet) {
       this.curSheet = curSheet
       if(curSheet){
-        const res = await this.$store.dispatch('GetSheetDetail', { shopServerUrl: this.shopServerUrl, sheetids: [curSheet.SheetID]})
+        const res = await this.$store.dispatch('GetSheetDetail', { shopServerUrl: this.shopServerUrl, auth: this.auth, sheetids: [curSheet.SheetID]})
         const items = res[0]
         this.items = items
         this.logs = res[1]
@@ -289,7 +290,8 @@ export default {
         this.$message.error('所选店铺没有配置店铺服务URL地址')
         return
       }
-      this.shopServerUrl = shopServerUrl + '/api'
+      if(this.IsHQ && shopServerUrl)
+        this.shopServerUrl = shopServerUrl + '/api'
       await this.SearchSheet()     
     },
     handleSizeChange(val) {

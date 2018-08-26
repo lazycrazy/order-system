@@ -4,7 +4,7 @@
 
 export function isvalidUsername(str) {
   // const reg = /^([0-9A-Za-z\-_\.]+)@([0-9a-z]+\.[a-z]{2,3}(\.[a-z]{2})?)$/g
-  const reg = /^[0-9]{4,8}$/g
+  const reg = /^[0-9A-Za-z]{4,8}$/g
   return reg.test(str)
 }
 
