@@ -136,5 +136,39 @@ export const asyncRouterMap = [
         icon: 'table' 
       }}]
   },
+  {
+    path: '/order-review-query',
+    name: 'order-review-query', 
+    component: Layout,
+    meta: {
+      title: 'orderReviewQuery',
+      roles: ['admin']
+    },
+    children: [{ 
+      path: 'index', 
+      component: () => import('@/views/order-review-query/index'), 
+      name: 'orderReviewQuery', 
+      meta: { 
+        title: 'orderReviewQuery', 
+        icon: 'table' 
+      }}]
+  },
+  {
+    path: '/order-qty-query',
+    name: 'order-qty-query', 
+    component: Layout,
+    meta: {
+      title: 'orderQtyQuery',
+      roles: ['admin']
+    },
+    children: [{ 
+      path: 'index', 
+      component: () => import('@/views/order-qty-query/index'), 
+      name: 'orderQtyQuery', 
+      meta: { 
+        title: 'orderQtyQuery', 
+        icon: 'table' 
+      }}]
+  },
   { path: '*', redirect: '/404', hidden: true }
 ]

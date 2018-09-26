@@ -47,9 +47,19 @@
      <el-table-column 
       label="商品" width='400px'>
       <template slot-scope="scope">
-        <span style="margin-left: 10px">{{ scope.row.goodsname }}</span>
+        <span style="margin-left: 10px">{{ scope.row.customno + ' - ' + scope.row.goodsname }}</span>
       </template>
     </el-table-column>
+    <el-table-column
+      prop="barcodeid"
+      label="条码" width="180"/>
+    </el-table-column>
+    <el-table-column 
+        label="课" width='230'>
+         <template slot-scope="scope">
+        <span style="margin-left: 10px">{{ scope.row.kid +' - ' + scope.row.kname }}</span>
+       </template>
+      </el-table-column>
       <el-table-column 
         label="小类" width='230'>
          <template slot-scope="scope">
@@ -57,9 +67,14 @@
        </template>
       </el-table-column>
       <el-table-column
+      prop="cost"
+      label="进价" />
+      <el-table-column
+      prop="minorderqty"
+      label="最小订货数" />
+      <el-table-column
       prop="ordermultiple"
-      label="最大订货倍数"
-      >
+      label="最大订货倍数">
       </el-table-column>
       <el-table-column
       prop="OrderNum"

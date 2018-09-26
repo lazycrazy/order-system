@@ -10,8 +10,10 @@ import {
   setFunctionSetting,
   deleteFunctionSetting,
   setFunctionSettingByShop,
+  getSheetsQuery,
   getSheets,
   getSheetDetail,
+  getSheetDetailQuery,
   getUserReviewAuth,
   getItemReason,
   setSheetLog,
@@ -21,7 +23,8 @@ import {
   getShopServerInfos,
   getShopServerUrl,
   functionSettingImport,
-  getShopTypes
+  getShopTypes,
+  getOriginQty
 } from '@/api/query'
 
 const query = {
@@ -79,6 +82,18 @@ const query = {
     },
     async GetSheets({ commit }, data) {
       const res = await getSheets(data)
+      return res.data
+    },
+    async GetOriginQty({ commit }, data) {
+      const res = await getOriginQty(data)
+      return res.data
+    },
+    async GetSheetDetailQuery({ commit }, data) {
+      const res = await getSheetDetailQuery(data)
+      return res.data
+    },
+    async GetSheetsQuery({ commit }, data) {
+      const res = await getSheetsQuery(data)
       return res.data
     },
     async SetFunctionSettingByShop({ commit }, data) {

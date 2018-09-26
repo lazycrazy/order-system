@@ -119,6 +119,51 @@ export function getSheetDetail(data) {
   })
 }
 
+export function getSheetDetailQuery(data) {
+  if(data.shopServerUrl){
+    return requestSC(data.shopServerUrl)({
+      url: `/purchaseQuery/itemBySheetIds`,
+      method: 'post',
+      data
+    })
+  }
+  return request({
+    url: `/purchaseQuery/itemBySheetIds`,
+    method: 'post',
+    data
+  })
+}
+
+export function getSheetsQuery(data) {
+  if(data.shopServerUrl){
+    return requestSC(data.shopServerUrl)({
+      url: `/purchaseQuery/listByShop`,
+      method: 'post',
+      data
+    })
+  }
+  return request({
+    url: `/purchaseQuery/listByShop`,
+    method: 'post',
+    data
+  })
+}
+
+export function getOriginQty(data) {
+  if(data.shopServerUrl){
+    return requestSC(data.shopServerUrl)({
+      url: `/purchaseQuery/originqty`,
+      method: 'post',
+      data
+    })
+  }
+  return request({
+    url: `/purchaseQuery/originqty`,
+    method: 'post',
+    data
+  })
+}
+
 export function getSheets(data) {
   if(data.shopServerUrl){
     return requestSC(data.shopServerUrl)({

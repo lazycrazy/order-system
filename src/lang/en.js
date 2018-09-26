@@ -58,7 +58,9 @@ export default {
     orderPropertySetting: 'Order Property Setting',
     rolePermission: 'Role Permission',
     functionSetting: 'Function Setting',
-    orderReview: 'Order Review'
+    orderReview: 'Order Review',
+    orderReviewQuery: 'Order Review Query',
+    orderQtyQuery: 'Order Qty Query'
   },
   navbar: {
     logOut: 'Log Out',

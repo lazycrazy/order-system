@@ -58,7 +58,9 @@ export default {
     orderPropertySetting: '可订货属性设置',
     rolePermission: '角色审批权限设置',
     functionSetting: '审批功能设置',
-    orderReview: '订货审批'
+    orderReview: '订货审批',
+    orderReviewQuery: '订货审批查询',
+    orderQtyQuery: '实际补货量查询'
   },
   navbar: {
     logOut: '退出登录',

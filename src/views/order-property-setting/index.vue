@@ -23,7 +23,8 @@
         :value="item.shopid">
       </el-option>
     </el-select>
-    <el-button slot="append" @click="select" icon="el-icon-search"></el-button>
+    <el-button slot="append" @click="select" icon="el-icon-search">查找</el-button>
+    <!-- <el-button slot="append" @click="SetPLDXZ" icon="el-icon-edit">品类店型组设置</el-button> -->
   </div>
 
     <el-tabs v-model="activeName" class="tab">
@@ -239,7 +240,7 @@
                 </template>
               </el-table-column>
           <el-table-column
-            label="小类"
+            label="课"
             width="180">
             <template slot-scope="scope">
               <span style="margin-left: 10px">{{ scope.row.deptid + ' - ' + scope.row.deptname }}</span>
@@ -264,6 +265,38 @@
         </el-table>
       </el-tab-pane>
     </el-tabs>
+
+
+  <el-dialog title="品类店型组设置" :visible.sync="dialogFormVisible"  width="35%">
+    <el-form ref="dataForm" :model="temp" label-position="right" label-width="130px" >
+
+      <el-form-item label="店铺" prop="shops">
+        <el-select v-model="temp.shops" multiple collapse-tags style="margin-left: 20px;width: 300px;" placeholder="请选择"> 
+          <el-option v-for="item in shops" :key="item.shopid" :label="item.shopid + ' - '+ item.shopname" :value="item.shopid"> 
+        </el-option> 
+      </el-select>
+      </el-form-item>
+      <el-form-item label="课" prop="depts">
+        <el-select v-model="temp.depts" multiple collapse-tags style="margin-left: 20px;width: 240px;" placeholder="请选择"> 
+          <el-option v-for="item in depts5" :key="item.deptid" :label="item.deptid + ' - '+ item.deptname" :value="item.deptid"> 
+        </el-option>
+      </el-select>
+      </el-form-item>
+      <el-form-item label="sku类型" prop="skutypes">
+        <el-select v-model="temp.skutypes" multiple collapse-tags style="margin-left: 20px;width: 150px;" placeholder="请选择"> 
+        <el-option v-for="item in skuTypes5" :key="item.skutype" :label="item.skutype" :value="item.skutype"> </el-option>
+      </el-select>
+      </el-form-item>
+      <el-form-item label="是否可订货" prop="allowOrder">
+        <el-switch v-model='temp.allowOrder' active-text="可订" inactive-text="不可订" > </el-switch>
+      </el-form-item>       
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="dialogFormVisible = false">{{$t('table.cancel')}}</el-button>
+      <el-button type="primary" @click="confirm">{{$t('table.confirm')}}</el-button>
+    </div>
+  </el-dialog>
+
   </div>
 </template>
 
@@ -272,6 +305,15 @@ export default {
   name: 'orderPropertySetting',
   data() {
     return {
+      temp: {
+        shops: [],
+        depts: [],
+        skutypes: [],
+        allowOrder: false
+      },
+      depts5: [],
+      skuTypes5: [],
+      dialogFormVisible: false,
       allowOrder1: false,
       allowOrder2: false,
       allowOrder3: false,
@@ -350,6 +392,23 @@ export default {
     await this.loadTypeAndShops()
   },
   methods: {
+    async SetPLDXZ(){
+      let shops = this.selectedShops
+      if(!shops || shops.length === 0)
+        shops = this.type_shops.filter(f=> this.selectedTypes.includes(f.shoptypeid)).map(m=> m.shopid)
+      if(shops.length === 0) {
+        this.$message.warning('请选择店型组或店铺')
+        return
+      }
+      this.dialogFormVisible = true
+
+      const res = await this.$store.dispatch('GetDetpsAndSkutypes', { shops })
+      res.mlsxs.forEach(i => { i.allowOrder = !i.forbidden })
+      res.pldxzs.forEach(i => { i.allowOrder = !i.forbidden })
+      res.shops.forEach(i => { i.allowOrder = !i.forbidden })
+      res.xssxs.forEach(i => { i.allowOrder = !i.forbidden })
+      this.propertys = res
+    },
     async select(){
       let shops = this.selectedShops
       if(!shops || shops.length === 0)
