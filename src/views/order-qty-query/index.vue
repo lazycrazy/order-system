@@ -23,49 +23,45 @@
     </div>
     
  
-    <div class='top'>     
-      <div class='left' style="display:flex;">  
+    <div class='top'>      
 
-        <el-table class='fstable' ref="head" height="400" highlight-current-row  v-loading="table_loading" :data="sheets" >
-          <el-table-column   type="index"   width="50"> </el-table-column>
-
-
-          <el-table-column      width='220' label="店铺"  > 
-             <template slot-scope="scope">
-              <span>{{ scope.row.shopid + ' - ' + scope.row.shopname}}</span>
-            </template>
-          </el-table-column> 
-          <el-table-column    width='100' label="日期"  > 
-             <template slot-scope="scope">
-              <span>{{ scope.row.editdate }}</span>
-            </template>
-          </el-table-column> 
-          <el-table-column   prop="SheetID"  width='120' label="课"  > 
-             <template slot-scope="scope">
-              <span>{{ scope.row.kid + ' - ' + scope.row.kname }}</span>
-            </template>
-          </el-table-column> 
-          <el-table-column   prop="SheetID"  width='160' label="小类"  > 
-             <template slot-scope="scope">
-              <span>{{ scope.row.deptid + ' - ' + scope.row.deptname }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column   prop="barcodeid"  width='140' label="商品码"  /> 
-          <el-table-column   width='400' label="商品"  > 
-             <template slot-scope="scope">
-              <span>{{ scope.row.customno + ' - ' + scope.row.goodsname }}</span>
-            </template>
-          </el-table-column>             
-          <el-table-column   prop="minorderqty"  width='100' label="最小订货量"  /> 
-          <el-table-column   prop="oqty"  width='100' label="申请订货数"  /> 
-          <el-table-column   prop="qty"  width='100' label="批准订货数"  />  
-              
-          
-        </el-table>        
-      </div>  
+      <el-table fit  class='fstable' ref="head" height="400" highlight-current-row  v-loading="table_loading" :data="sheets" >
+        <el-table-column   type="index"   width="50"> </el-table-column>
+        <el-table-column   label="店铺"  > 
+           <template slot-scope="scope">
+            <span>{{ scope.row.shopid + ' - ' + scope.row.shopname}}</span>
+          </template>
+        </el-table-column> 
+        <el-table-column   label="日期"  > 
+           <template slot-scope="scope">
+            <span>{{ scope.row.editdate }}</span>
+          </template>
+        </el-table-column> 
+        <el-table-column  prop="SheetID"   label="课"  > 
+           <template slot-scope="scope">
+            <span>{{ scope.row.kid + ' - ' + scope.row.kname }}</span>
+          </template>
+        </el-table-column> 
+        <el-table-column  prop="SheetID"  label="小类"  > 
+           <template slot-scope="scope">
+            <span>{{ scope.row.deptid + ' - ' + scope.row.deptname }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column  prop="barcodeid"   label="商品码"  /> 
+        <el-table-column   label="商品"  > 
+           <template slot-scope="scope">
+            <span>{{ scope.row.customno + ' - ' + scope.row.goodsname }}</span>
+          </template>
+        </el-table-column>             
+        <el-table-column   prop="minorderqty"    label="最小订货量"  /> 
+        <el-table-column   prop="oqty"    label="申请订货数"  /> 
+        <el-table-column   prop="qty"    label="批准订货数"  />  
+            
+        
+      </el-table>   
       
       <div class="pagination-container">
-        <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="curpage" :page-sizes="[100,200,300,500]" :page-size="page_size" layout="total, sizes, prev, pager, next, jumper" :total="total">
+        <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="curpage" :page-sizes="[10,20,30,50]" :page-size="page_size" layout="total, sizes, prev, pager, next, jumper" :total="total">
         </el-pagination>
       </div>
     </div>
@@ -104,14 +100,14 @@ export default {
         num: [{ type: 'number', message: '必须为数字值'}, { required: true, message: '不能为空', trigger: 'blur' }],
       },
       curpage: 1,
-      page_size: 100,
+      page_size: 10,
       total: 0,
       auth: 0,
       reviewDesc: ['一审','二审','三审'],
       curSheet: null,
       sheetid: '',
       barcodeid: '',
-      editDateParam: [parseTime(new Date(),'{y}-{m}-{d}'),parseTime(new Date(),'{y}-{m}-{d}')],
+      editDateParam: [parseTime(new Date(),'{y}-{m}-{d}'),parseTime((new Date()).setDate((new Date()).getDate()+1),'{y}-{m}-{d}')],
       editRow: null,
       shopServerUrl: ''
     }    

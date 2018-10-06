@@ -104,7 +104,7 @@
   </el-table>
 
    <div class="pagination-container">
-      <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="curpage" :page-sizes="[100,200,300, 500]" :page-size="page_size" layout="total, sizes, prev, pager, next, jumper" :total="total">
+      <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="curpage" :page-sizes="[10,20,30, 50]" :page-size="page_size" layout="total, sizes, prev, pager, next, jumper" :total="total">
       </el-pagination>
     </div>
   </div>
@@ -200,7 +200,7 @@ export default {
         day_limit_amt: [{ type: 'number', message: '必须为数字值'}, { required: true, message: '不能为空', trigger: 'blur' }]
       },
       curpage: 1,
-      page_size: 100,
+      page_size: 10,
       total: 0
     }    
   },
@@ -418,7 +418,7 @@ $light_gray:#fff;
     border:2px solid beige;
     border-radius: 1px;
     padding: 10px;
-    min-height: 1000px;
+    min-height: 600px;
     display: flex;
     .left{
       border:2px solid beige;

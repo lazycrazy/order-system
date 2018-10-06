@@ -25,10 +25,10 @@
     <div class='top'>     
       <div class='left' style="display:flex;">  
 
-        <el-table class='fstable' ref="head" height="300" highlight-current-row @current-change="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
+        <el-table class='fstable' ref="head" height="300" highlight-current-row @row-click="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
           <el-table-column   type="index"   width="50"> </el-table-column>
           <el-table-column   prop="SheetID"  width='160' label="申请单号"  ></el-table-column>
-          <el-table-column   prop="AskType" width='90'  label="申请单类型"  > 
+          <el-table-column   prop="AskType" width='90'  label="类型"  > 
               <template slot-scope="scope">
                 {{scope.row.AskType | AskType_Desc}}
               </template>
@@ -47,10 +47,10 @@
           <el-table-column   prop="Operator"  label="操作人" ></el-table-column>
         </el-table>
         <span style="width:4px;background-color:yellow;">  </span>
-        <el-table class='fstable' ref="head" height="300" highlight-current-row @current-change="handleCurSheetChange" v-loading="table_loading" :data="sheets1" >
+        <el-table class='fstable' ref="head" height="300"  highlight-current-row @current-change="handleCurSheetChange" v-loading="table_loading" :data="sheets1" >
           <el-table-column   type="index"   width="50"> </el-table-column>
           <el-table-column   prop="SheetID"  width='160' label="单号"  ></el-table-column>
-          <el-table-column   prop="AskType" width='90'  label="申请单类型"  > 
+          <el-table-column   prop="AskType" width='90'  label="类型"  > 
               <template slot-scope="scope">
                 {{scope.row.AskType | AskType_Desc}}
               </template>
@@ -61,7 +61,7 @@
             </template>
           </el-table-column>
           <el-table-column   prop="Editor"  width='80' label="制单人" >  </el-table-column>
-          <el-table-column  width='180'  label="制单日期" >
+          <el-table-column  width='180'  label="审核日期" >
             <template slot-scope="scope">
               <span>{{new Date(scope.row.EditDate) | parseTime('{y}-{m}-{d} {h}:{i}:{s}')}}</span>
             </template>
@@ -79,7 +79,7 @@
     <div class='bottom'>
       <el-tabs class='tab' value='second' type="border-card">
         <el-tab-pane label="明细" name="first">
-          <el-table class='items' v-loading="table_loading" :data="items" max-height='500'  width='100%' >
+          <el-table fit height="250" class='items' v-loading="table_loading" :data="items" max-height='500'  width='100%' >
             <el-table-column type="index" width="50"></el-table-column>
              <el-table-column label="商品" width='250'>
               <template slot-scope="scope">
@@ -94,8 +94,8 @@
             
           </el-table>
         </el-tab-pane>
-        <el-tab-pane label="日志" name="second">
-          <el-table class='logs' v-loading="table_loading":data="logs" width='100%' >
+        <el-tab-pane  label="日志" name="second">
+          <el-table fit height="250" class='logs' v-loading="table_loading":data="logs" width='100%' >
             <el-table-column type="index" width="50"></el-table-column>      
             <el-table-column label="记录时间" width='150'>
               <template slot-scope="scope">
@@ -184,7 +184,7 @@ export default {
       reviewDesc: ['一审','二审','三审'],
       curSheet: null,
       sheetid: '',
-      editDateParam: [parseTime(new Date(),'{y}-{m}-{d}'),parseTime(new Date(),'{y}-{m}-{d}')],
+      editDateParam: [parseTime(new Date(),'{y}-{m}-{d}'),parseTime((new Date()).setDate((new Date()).getDate()+1),'{y}-{m}-{d}')],
       editRow: null,
       shopServerUrl: ''
     }    

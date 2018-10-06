@@ -12,6 +12,8 @@
       </el-badge>
       </div> -->
       <el-alert :closable="false" v-if='IsHQ && show' title="有三审单据" type="error" class='item'> </el-alert>
+      
+
       <el-tooltip effect="dark" :content="$t('navbar.screenfull')" placement="bottom">
         <screenfull class="screenfull right-menu-item"></screenfull>
       </el-tooltip>
@@ -21,23 +23,26 @@
       <!-- <el-tooltip effect="dark" :content="$t('navbar.theme')" placement="bottom">
         <theme-picker class="theme-switch right-menu-item"></theme-picker>
       </el-tooltip> -->
-
-      <el-dropdown class="avatar-container right-menu-item" trigger="click">
-        <div class="avatar-wrapper">
-          <img class="user-avatar" > <!--:src="avatar || '/img/user.png'">-->
-          <i class="el-icon-caret-bottom"></i>
-        </div>
-        <el-dropdown-menu slot="dropdown">
-          <router-link to="/">
-            <el-dropdown-item>
-              {{$t('navbar.dashboard')}}
+        <el-dropdown class="avatar-container right-menu-item" trigger="click">
+      <el-tooltip effect="dark" :content="store + ' ' +curUser.uname.split('-')[1].trim() +'['+ curUser.rolename.trim()+']' " placement="bottom-end">
+          <div class="avatar-wrapper">
+            <img class="user-avatar" > <!--:src="avatar || '/img/user.png'">-->
+            <i class="el-icon-caret-bottom"></i>
+          </div>
+      </el-tooltip>
+          <el-dropdown-menu slot="dropdown">
+            <router-link to="/">
+              <el-dropdown-item>
+                {{$t('navbar.dashboard')}}
+              </el-dropdown-item>
+            </router-link>          
+            <el-dropdown-item divided>
+              <span @click="logout" style="display:block;">{{$t('navbar.logOut')}}</span>
             </el-dropdown-item>
-          </router-link>          
-          <el-dropdown-item divided>
-            <span @click="logout" style="display:block;">{{$t('navbar.logOut')}}</span>
-          </el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
+          </el-dropdown-menu>
+        </el-dropdown>
+
+
     </div>
   </el-menu>
 </template>
@@ -56,7 +61,9 @@ export default {
     return {
       IsHQ: process.env.SYS === "HQ",
       show: false,
-      timer: null
+      timer: null,
+      curUser: null,
+      store: ''
     }
   },
   components: {
@@ -75,8 +82,15 @@ export default {
     ])
   },
   async created(){
-    if(this.IsHQ)
+    const user = await this.$store.dispatch('SearchUserInfo')
+    this.curUser = user[0]
+    if(this.IsHQ){
       await this.refresh3Review()
+    }
+    else {
+      const res = await this.$store.dispatch('GetCurShop')
+      this.store = res[0].label
+    }
   },
   methods: {
     toggleSideBar() {
@@ -109,6 +123,14 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
+  @import "src/styles/mixin.scss";
+
+.s-u-desc{
+  display: flex;
+    justify-content:center;
+    align-items:Center;
+}
+
 .navbar {
   height: 50px;
   line-height: 50px;

@@ -125,7 +125,6 @@ export const asyncRouterMap = [
     component: Layout,
     meta: {
       title: 'orderReview',
-      roles: ['admin']
     },
     children: [{ 
       path: 'index', 
@@ -142,7 +141,6 @@ export const asyncRouterMap = [
     component: Layout,
     meta: {
       title: 'orderReviewQuery',
-      roles: ['admin']
     },
     children: [{ 
       path: 'index', 
@@ -159,7 +157,6 @@ export const asyncRouterMap = [
     component: Layout,
     meta: {
       title: 'orderQtyQuery',
-      roles: ['admin']
     },
     children: [{ 
       path: 'index', 

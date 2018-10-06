@@ -24,7 +24,8 @@ import {
   getShopServerUrl,
   functionSettingImport,
   getShopTypes,
-  getOriginQty
+  getOriginQty,
+  getUserInfo
 } from '@/api/query'
 
 const query = {
@@ -35,7 +36,10 @@ const query = {
   },
 
   actions: {    
-    
+    async SearchUserInfo({ commit }) {
+      const res = await getUserInfo()
+      return res.data
+    },
     async GetShopTypes({ commit }) {
       const res = await getShopTypes()
       return res.data

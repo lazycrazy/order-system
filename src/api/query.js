@@ -1,6 +1,13 @@
 import request from '@/utils/request'
 import requestSC from '@/utils/requestSC'
 
+export function getUserInfo() {
+  return request({
+    url: `/query/userInfo`,
+    method: 'get'
+  })
+}
+
 export function getShopTypes() {
   return request({
     url: `/query/shopTypes`,
