@@ -8,12 +8,15 @@
         :value="item.value">
       </el-option>
     </el-select>
-  <!-- <el-button type="primary" @click.native.prevent="SearchSheet">{{$t('table.search')}}</el-button> -->
+    <el-select v-model="depts" multiple collapse-tags style="margin-left: 20px;width: 240px;" placeholder="请选择"> 
+          <el-option v-for="item in userdepts" :key="item.deptid" :label="item.deptid + ' - '+ item.deptname" :value="item.deptid"> 
+        </el-option>
+      </el-select>
+    <el-button type="primary" @click.native.prevent="handleShopChange">{{$t('table.search')}}</el-button> 
  
     
 
-    <split-pane split="horizontal" :min-percent='20' :default-percent='40'>
-      <template slot="paneL">
+    
         <el-table class='fstable' ref="head"  highlight-current-row @row-click="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
           <el-table-column   type="index"   width="50"> </el-table-column>
           <el-table-column  prop="ShopName"   label="店铺" width='190'></el-table-column>     
@@ -51,13 +54,9 @@
           </el-table-column>
         </el-table>
 
-        <div class="pagination-container">
           <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="curpage" :page-sizes="[10,20,30,50]" :page-size="page_size" layout="total, sizes, prev, pager, next, jumper" :total="total">
           </el-pagination>
-        </div>
-      </template>
-      <template slot="paneR">
-        <div class='bottom'>
+       
           <el-tabs class='tab' value='first' type="border-card">
             <el-tab-pane label="明细" name="first">
               <el-table fit :row-style="rowClass" class='items' v-loading="table_loading" :data="items" max-height='1000'  width='100%' >
@@ -95,9 +94,7 @@
               </el-table>
             </el-tab-pane>
           </el-tabs>
-        </div>
-      </template>
-    </split-pane>
+       
 
     
 <el-dialog title="修改订货数量" :visible.sync="dialogFormVisible"  width="35%">
@@ -185,7 +182,9 @@ export default {
       reviewDesc: ['一审','二审','三审'],
       curSheet: null,
       editRow: null,
-      shopServerUrl: ''
+      shopServerUrl: '',
+      userdepts:[],
+      depts: []
     }    
   },
   filters: {
@@ -230,7 +229,8 @@ export default {
     },
     async logNext(auth, row){
       const res = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: this.reviewDesc[auth - 1]+" -> 下一级审批", auth: -(auth + 10) })
-      await this.handleCurSheetChange(row)
+      await this.SearchSheet()
+      await this.handleCurSheetChange()
     },
     canReview(auth, row){
       const can = this.auth === auth && !row.reason
@@ -242,14 +242,16 @@ export default {
     },
     async fetchData() {
       const auth = await this.$store.dispatch('GetUserReviewAuth')
-      console.log(auth)
       this.auth = auth
+      const res1 = await this.$store.dispatch('GetUserDepts')
+      this.userdepts = res1
       const res = await this.$store.dispatch('GetCurShop')
       this.shops = res.sort((a,b)=>(a.value>b.value?1:(b.value >a.value? -1 : 0)))
       if (this.shops.length > 0) {
         this.curshop = this.shops[0].value
-        this.handleShopChange(this.curshop) 
+        this.handleShopChange() 
       }
+      
     },
     async getShopServerUrl() {
       let shopServerUrl = ''
@@ -263,7 +265,10 @@ export default {
     async SearchSheet() {
       if(!this.curshop) return       
       this.table_loading = true
-      const res = await this.$store.dispatch('GetSheets', { shopid: this.curshop, auth: this.auth, curpage: this.curpage || 1 , pagesize: this.page_size || 10, shopServerUrl: this.shopServerUrl })
+    console.log(this.depts)
+    console.log(this.userdepts)
+      const depts = this.depts.length > 0 ? this.depts : this.userdepts.map(d=> d.deptid)
+      const res = await this.$store.dispatch('GetSheets', { shopid: this.curshop, auth: this.auth, curpage: this.curpage || 1 , pagesize: this.page_size || 10, shopServerUrl: this.shopServerUrl, depts })
       const sheets = res.fs
       this.total = res.total
       if(sheets.length > 0){
@@ -298,7 +303,7 @@ export default {
         this.logs = []
       }
     },
-    async handleShopChange(curshop) {
+    async handleShopChange() {
       this.shopServerUrl = ''
       this.sheets = []
       this.items = []
@@ -360,10 +365,7 @@ $light_gray:#fff;
   position: relative;
   height: 100vh;
 }
-.pagination-container {
-  position: absolute;
-  bottom: 0;
-}
+
 </style>
 
 

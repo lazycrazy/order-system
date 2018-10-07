@@ -25,7 +25,8 @@ import {
   functionSettingImport,
   getShopTypes,
   getOriginQty,
-  getUserInfo
+  getUserInfo,
+  getUserDepts
 } from '@/api/query'
 
 const query = {
@@ -35,7 +36,12 @@ const query = {
   mutations: {
   },
 
-  actions: {    
+  actions: {  
+
+    async GetUserDepts({ commit }) {
+      const res = await getUserDepts()
+      return res.data
+    },  
     async SearchUserInfo({ commit }) {
       const res = await getUserInfo()
       return res.data

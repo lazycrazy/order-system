@@ -69,7 +69,7 @@
           </el-table-column>
         </el-table>
       </el-tab-pane>
-      <el-tab-pane label="毛利属性" name="2">
+      <el-tab-pane label="销售属性" name="2">
         <el-select 
         v-model="selectedShops2"
         multiple collapse-tags
@@ -111,7 +111,7 @@
               </template>
             </el-table-column>
              <el-table-column
-              label="毛利属性"
+              label="销售属性"
               width="180">
               <template slot-scope="scope">
                 <span style="margin-left: 10px">{{ scope.row.sxname }}</span>
@@ -128,7 +128,7 @@
             </el-table-column>
           </el-table>
       </el-tab-pane>
-      <el-tab-pane label="销售属性" name="3">
+      <el-tab-pane label="毛利属性" name="3">
         <el-select 
         v-model="selectedShops3"
         multiple collapse-tags
@@ -169,7 +169,7 @@
               </template>
             </el-table-column>
             <el-table-column
-            label="销售属性"
+            label="毛利属性"
             width="180">
               <template slot-scope="scope">
                 <span style="margin-left: 10px">{{ scope.row.sxname }}</span>

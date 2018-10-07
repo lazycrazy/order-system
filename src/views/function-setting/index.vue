@@ -234,14 +234,22 @@ export default {
               },{})
             return o
           })
-          console.log(srows)
+          // console.log(srows)
+         const batchRows = chunkArray(srows, 2000)
+        self.$message.warning(`数据太大分${batchRows.length}次导入,2000/每次`)
+        let ucount = 0
+        let icount = 0
+         for(let nrows of batchRows){
           //发送到服务端
-         const res = await self.$store.dispatch('FunctionSettingImport', { data: srows}) 
-          console.log(res)
-          self.$message.success(`更新：${res[0]}条，新增：${res[1]}条`)
+           const res = await self.$store.dispatch('FunctionSettingImport', { data: nrows}) 
+            // console.log(res)
+            ucount = ucount + res[0]
+            icount = icount + res[1]
+            self.$message.success(`更新：${res[0]}条，新增：${res[1]}条`)
+         }
+         self.$message.success(`总共更新：${ucount}条，新增：${icount}条`)
       }
       reader.readAsText(file)    
-
       this.$refs['import'].value = null
     },
     async fetchData() { 

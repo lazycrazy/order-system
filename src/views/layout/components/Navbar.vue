@@ -26,7 +26,8 @@
         <el-dropdown class="avatar-container right-menu-item" trigger="click">
       <el-tooltip effect="dark" :content="store + ' ' +curUser.uname.split('-')[1].trim() +'['+ curUser.rolename.trim()+']' " placement="bottom-end">
           <div class="avatar-wrapper">
-            <img class="user-avatar" > <!--:src="avatar || '/img/user.png'">-->
+            <!--<img class="user-avatar" />{{SYS}}  :src="avatar || '/img/user.png'">-->
+            <div class="user-avatar" >{{SYS}}</div>
             <i class="el-icon-caret-bottom"></i>
           </div>
       </el-tooltip>
@@ -60,6 +61,7 @@ export default {
   data(){
     return {
       IsHQ: process.env.SYS === "HQ",
+      SYS: process.env.SYS === "HQ"?"总部":"店铺",
       show: false,
       timer: null,
       curUser: null,
@@ -149,14 +151,15 @@ export default {
     vertical-align: top;
   }
   .right-menu {
-    float: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
     height: 100%;
     &:focus{
      outline: none;
     }
     .item {
-      display: inline;
-      top: -30%;
+      width: 120px;
     }
     .right-menu-item {
       display: inline-block;
@@ -179,6 +182,8 @@ export default {
         margin-top: 5px;
         position: relative;
         .user-avatar {
+          display: flex;
+          align-items: center;
           width: 40px;
           height: 40px;
           border-radius: 10px;

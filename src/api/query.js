@@ -8,6 +8,13 @@ export function getUserInfo() {
   })
 }
 
+export function getUserDepts() {
+  return request({
+    url: `/query/userDepts`,
+    method: 'get'
+  })
+}
+
 export function getShopTypes() {
   return request({
     url: `/query/shopTypes`,

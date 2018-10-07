@@ -8,7 +8,7 @@ function requestSC(base_api){
 // create an axios instance
 const service = axios.create({
   baseURL: base_api, // api的base_url
-  timeout: 10000 // request timeout
+  timeout: 100000 // request timeout
 })
 
 // request interceptor
