@@ -33,7 +33,7 @@
                 {{scope.row.AskType | AskType_Desc}}
               </template>
           </el-table-column>
-          <el-table-column  width='60' label="状态"  >
+          <el-table-column  width='80' label="状态"  >
             <template slot-scope="scope">
                 {{Flag_Desc[scope.row.Flag] || scope.row.Flag}}
             </template>

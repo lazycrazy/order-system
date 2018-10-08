@@ -32,7 +32,7 @@
             <span>{{ scope.row.shopid + ' - ' + scope.row.shopname}}</span>
           </template>
         </el-table-column> 
-        <el-table-column   label="日期"  > 
+        <el-table-column   label="审核日期"  > 
            <template slot-scope="scope">
             <span>{{ scope.row.editdate }}</span>
           </template>
