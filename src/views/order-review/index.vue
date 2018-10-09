@@ -13,7 +13,7 @@
         </el-option>
       </el-select>
     <el-button type="primary" @click.native.prevent="handleShopChange">{{$t('table.search')}}</el-button> 
- 
+    {{auth}}审权限
     
 
     
@@ -43,13 +43,16 @@
             </template>
           </el-table-column>
           <el-table-column   prop="Operator"  label="操作人" ></el-table-column>
-          <el-table-column label="审批">
+          <el-table-column width='190' label="审批">
             <template slot-scope="scope">
               <el-button size="mini" type="danger" v-if="canReview(1, scope.row)" @click="review(1, scope.row)">{{reviewDesc[0]}}</el-button>
               <el-button size="mini" type="danger" v-if="canNextReview(1, scope.row)" @click="logNext(1, scope.row)">下一级审批</el-button>
               <el-button size="mini" type="danger" v-if="canReview(2, scope.row)" @click="review(2, scope.row)">{{reviewDesc[1]}}</el-button>
               <el-button size="mini" type="danger" v-if="canNextReview(2, scope.row)" @click="logNext(2, scope.row)">下一级审批</el-button>
               <el-button size="mini" type="danger" v-if="canReview(3, scope.row)" @click="review(3, scope.row)">{{reviewDesc[2]}}</el-button>
+
+              <el-button size="mini" type="danger" v-if="canReject(scope.row)" @click="reject(scope.row)">驳回</el-button>
+
             </template>
           </el-table-column>
         </el-table>
@@ -227,6 +230,22 @@ export default {
       this.logs = []
       await this.SearchSheet()
     },
+    async reject(row){
+      const resl = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: '驳回', auth: -(this.auth + 99) })
+      console.log(resl)
+      const res = await this.$store.dispatch('RejectSheet', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID })
+      console.log(res)
+      this.$notify({
+        title: '成功',
+        message: '驳回' + '成功',
+        type: 'success',
+        duration: 2000
+      })
+      this.curSheet = null
+      this.items = []
+      this.logs = []
+      await this.SearchSheet()
+    },
     async logNext(auth, row){
       const res = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: this.reviewDesc[auth - 1]+" -> 下一级审批", auth: -(auth + 10) })
       await this.SearchSheet()
@@ -238,6 +257,10 @@ export default {
     },
     canNextReview(auth, row){
       const can = this.auth === auth && row.reason
+      return can
+    },
+    canReject(row){
+      const can = this.auth && this.auth > 0 
       return can
     },
     async fetchData() {

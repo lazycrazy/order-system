@@ -18,6 +18,7 @@ import {
   getItemReason,
   setSheetLog,
   reviewSheet,
+  rejectSheet,
   updateItem,
   getGoodsIdBySF,
   getShopServerInfos,
@@ -26,7 +27,8 @@ import {
   getShopTypes,
   getOriginQty,
   getUserInfo,
-  getUserDepts
+  getUserDepts,
+  syncMaster
 } from '@/api/query'
 
 const query = {
@@ -37,7 +39,10 @@ const query = {
   },
 
   actions: {  
-
+    async SyncMaster({ commit }) {
+      const res = await syncMaster()
+      return res.data
+    },  
     async GetUserDepts({ commit }) {
       const res = await getUserDepts()
       return res.data
@@ -76,6 +81,10 @@ const query = {
     },
     async ReviewSheet({ commit }, data) {
       const res = await reviewSheet(data)
+      return res.data
+    },
+    async RejectSheet({ commit }, data) {
+      const res = await rejectSheet(data)
       return res.data
     },
     async GetItemReason({ commit }, data) {

@@ -1,6 +1,13 @@
 import request from '@/utils/request'
 import requestSC from '@/utils/requestSC'
 
+export function syncMaster() {
+  return request({
+    url: `/sync/master`,
+    method: 'get'
+  })
+}
+
 export function getUserInfo() {
   return request({
     url: `/query/userInfo`,
@@ -77,6 +84,21 @@ export function reviewSheet(data) {
   }
   return request({
     url: `/purchase/review`,
+    method: 'post',
+    data
+  })
+}
+
+export function rejectSheet(data) {
+  if(data.shopServerUrl){
+    return requestSC(data.shopServerUrl)({
+      url: `/purchase/reject`,
+      method: 'post',
+      data
+    })
+  }
+  return request({
+    url: `/purchase/reject`,
     method: 'post',
     data
   })

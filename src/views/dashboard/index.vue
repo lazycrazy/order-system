@@ -3,6 +3,9 @@
     <span>仪表盘</span>
     <!-- <div class="dashboard-text">name:{{name}}</div>
     <div class="dashboard-text">roles:<span v-for='role in roles' :key='role'>{{role}}</span></div> -->
+     
+    <el-button size="mini" v-if="!IsHQ" type="danger"  @click="syncMaster">下载同步本店订货设置</el-button>
+
     <el-table v-if='IsHQ'
     :data="shopInfos"
     style="width: 100%">
@@ -37,7 +40,13 @@ export default {
     async fetchData() {
       if(!this.IsHQ) return
       this.shopInfos = await this.$store.dispatch('GetShopServerInfos')      
-    }     
+    },
+    async syncMaster() {
+      if(this.IsHQ) return
+      const res = await this.$store.dispatch('SyncMaster')      
+      console.log('syncMaster'+res)
+      this.$message.success('同步完成') 
+    } 
   },
   computed: {
     ...mapGetters([
