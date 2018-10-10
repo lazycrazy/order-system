@@ -28,7 +28,8 @@
       :props="defaultProps"
       :data="shopGoods"
       show-checkbox
-      @check-change="handleCheckChange" >
+      @check-change="handleCheckChange"
+      @node-click="nodeclick" >
     </el-tree>
 </div>
   <div class='right'>
@@ -37,6 +38,8 @@
       <el-radio-button :label="2">二级审批</el-radio-button>
       <el-radio-button :label="3">三级审批</el-radio-button>
     </el-radio-group>
+    <el-tag  v-model="filterStr" v-if="filterStr" closable  :disable-transitions="false"
+  @close="handleCloseTag(tag)">  {{filterStr}} </el-tag>
     <el-table class='fstable' 
     v-loading="table_loading"
     :data="functionSettings" >
@@ -163,7 +166,7 @@
 <script>
 import { groupBy, chunkArray } from '@/utils'
 
-
+const typeDesc=['部','课','大类','中类','小类','商品']
 export default {
   name: 'functionSetting',
   data() {
@@ -201,7 +204,8 @@ export default {
       },
       curpage: 1,
       page_size: 10,
-      total: 0
+      total: 0,
+      filterStr: ''
     }    
   },
   computed: {
@@ -291,9 +295,18 @@ export default {
     },
     async refreshFunctionSettings() {
       if(!this.curfunc || !this.curshop) return 
+      let goodsid = null
+      let deptid = null
+      if(this.filterStr){
+        const type2id = this.filterStr.split('-')
+        if(type2id[0].trim() === typeDesc[5])
+          goodsid = type2id[1].trim()
+        else
+          deptid = type2id[1].trim()
+      }
       this.table_loading = true
       let that = this      
-      const res = await that.$store.dispatch('GetFunctionSetting', { shopid: that.curshop, funcid: that.curfunc, curpage: that.curpage || 1 , pagesize: that.page_size || 100 })
+      const res = await that.$store.dispatch('GetFunctionSetting', { shopid: that.curshop, funcid: that.curfunc, curpage: that.curpage || 1 , pagesize: that.page_size || 100, goodsid, deptid })
       console.log('fs')
       console.log(res)
       that.functionSettings = res.fs
@@ -307,6 +320,16 @@ export default {
     },
     async handleFunctionChange(row) {
         await this.refreshFunctionSettings()
+    },
+    async nodeclick(nodedata){
+       console.log(nodedata)
+       this.filterStr = typeDesc[nodedata.type - 1]+' - '+ nodedata.id
+       this.refreshFunctionSettings()
+    },
+    async handleCloseTag(tag){
+       console.log(tag)
+       this.filterStr = ''
+       this.refreshFunctionSettings()       
     },
     handleSizeChange(val) {
       this.page_size = val
@@ -376,15 +399,15 @@ export default {
           const ids = that.$refs.tree.getCheckedNodes().filter(n=>n.type===6).map(n=> n.id)
           //获取已存在的商品ID 
           const exIds = await that.$store.dispatch('GetGoodsIdBySF', { shopid: that.curshop, functionid: that.curfunc})
-          console.log(ids)
-          console.log(exIds)
+          // console.log(ids)
+          // console.log(exIds)
           obj.iids = chunkArray(ids.filter(i=> exIds.findIndex(fs=> fs.goodsid === i) === -1), 1000)
           obj.uids = chunkArray(ids.filter(i=> exIds.findIndex(fs=> fs.goodsid === i) > -1), 1000)
-          console.log(ids.length)
-          console.log(obj.iids.length)
-          console.log(obj.uids.length)
+          // console.log(ids.length)
+          // console.log(obj.iids.length)
+          // console.log(obj.uids.length)
            
-          console.log(obj)
+          // console.log(obj)
           const res = await that.$store.dispatch('SetFunctionSetting', obj)
           console.log(res)
           await this.refreshFunctionSettings()

@@ -216,7 +216,7 @@ export default {
     },
     async review(auth, row){
       const resl = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: this.reviewDesc[auth - 1], auth })
-      console.log(resl)
+      // console.log(resl)
       const res = await this.$store.dispatch('ReviewSheet', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID })
       console.log(res)
       this.$notify({
@@ -232,9 +232,9 @@ export default {
     },
     async reject(row){
       const resl = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: '驳回', auth: -(this.auth + 99) })
-      console.log(resl)
+      // console.log(resl)
       const res = await this.$store.dispatch('RejectSheet', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID })
-      console.log(res)
+      // console.log(res)
       this.$notify({
         title: '成功',
         message: '驳回' + '成功',
@@ -288,8 +288,8 @@ export default {
     async SearchSheet() {
       if(!this.curshop) return       
       this.table_loading = true
-    console.log(this.depts)
-    console.log(this.userdepts)
+    // console.log(this.depts)
+    // console.log(this.userdepts)
       const depts = this.depts.length > 0 ? this.depts : this.userdepts.map(d=> d.deptid)
       const res = await this.$store.dispatch('GetSheets', { shopid: this.curshop, auth: this.auth, curpage: this.curpage || 1 , pagesize: this.page_size || 10, shopServerUrl: this.shopServerUrl, depts })
       const sheets = res.fs
@@ -355,7 +355,7 @@ export default {
           const tempData = Object.assign({}, that.temp)
           const obj = {sheetid: that.editRow.SheetID, goodsid: that.editRow.GoodsID,  qty: tempData.num, desc:"编辑", shopServerUrl: that.shopServerUrl }           
           const res = await that.$store.dispatch('UpdateItem', obj)
-          console.log(res)
+          // console.log(res)
           await that.handleCurSheetChange(this.curSheet)
           that.dialogFormVisible = false
           that.editRow = null

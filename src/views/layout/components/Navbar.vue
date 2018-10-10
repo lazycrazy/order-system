@@ -24,7 +24,7 @@
         <theme-picker class="theme-switch right-menu-item"></theme-picker>
       </el-tooltip> -->
         <el-dropdown class="avatar-container right-menu-item" trigger="click">
-      <el-tooltip effect="dark" :content="store + ' ' +curUser.uname.split('-')[1].trim() +'['+ curUser.rolename.trim()+']' " placement="bottom-end">
+      <el-tooltip effect="dark" :content="StoreAndUserInfo" placement="bottom-end">
           <div class="avatar-wrapper">
             <!--<img class="user-avatar" />{{SYS}}  :src="avatar || '/img/user.png'">-->
             <div class="user-avatar" >{{SYS}}</div>
@@ -64,7 +64,7 @@ export default {
       SYS: process.env.SYS === "HQ"?"总部":"店铺",
       show: false,
       timer: null,
-      curUser: null,
+      curUser: {uname:'',rolename:''},
       store: ''
     }
   },
@@ -81,7 +81,10 @@ export default {
       'sidebar',
       'name',
       'avatar'
-    ])
+    ]),
+    StoreAndUserInfo(){
+     return  this.store + ' ' +(this.curUser && this.curUser.uname&&this.curUser.uname.split('-')[1]&&this.curUser.uname.split('-')[1].trim()) +'['+ (this.curUser&&this.curUser.rolename&&this.curUser.rolename.trim())+']' 
+    }
   },
   async created(){
     const user = await this.$store.dispatch('SearchUserInfo')
