@@ -23,34 +23,11 @@
     
  
     <div class='top'>     
-      <div class='left' style="display:flex;">  
-
-        <el-table class='fstable' ref="head" height="300" highlight-current-row @row-click="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
-          <el-table-column   type="index"   width="50"> </el-table-column>
-          <el-table-column   prop="SheetID"  width='160' label="申请单号"  ></el-table-column>
-          <el-table-column   prop="AskType" width='90'  label="类型"  > 
-              <template slot-scope="scope">
-                {{scope.row.AskType | AskType_Desc}}
-              </template>
-          </el-table-column>
-          <el-table-column  width='80' label="状态"  >
-            <template slot-scope="scope">
-                {{Flag_Desc[scope.row.Flag] || scope.row.Flag}}
-            </template>
-          </el-table-column>
-          <el-table-column   prop="Editor"  width='80' label="制单人" >  </el-table-column>
-          <el-table-column  width='180' label="制单日期" >
-            <template slot-scope="scope">
-              <span>{{new Date(scope.row.EditDate) | parseTime('{y}-{m}-{d} {h}:{i}:{s}')}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column   prop="Operator"  label="操作人" ></el-table-column>
-        </el-table>
-        <span style="width:4px;background-color:yellow;">  </span>
-        <el-table class='fstable' ref="head" height="300"  highlight-current-row @current-change="handleCurSheetChange" v-loading="table_loading" :data="sheets1" >
-          <el-table-column   type="index"   width="50"> </el-table-column>
-          <el-table-column   prop="SheetID"  width='160' label="单号"  ></el-table-column>
-          <el-table-column   prop="AskType" width='90'  label="类型"  > 
+      <div class='left'> 
+        <el-table ref="head" height="300" highlight-current-row @row-click="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
+          <el-table-column   type="index"   width="30"> </el-table-column>
+          <el-table-column   prop="SheetID"  width='150' label="申请单号"  ></el-table-column>
+          <el-table-column   prop="AskType" width='60'  label="类型"  > 
               <template slot-scope="scope">
                 {{scope.row.AskType | AskType_Desc}}
               </template>
@@ -60,20 +37,42 @@
                 {{Flag_Desc[scope.row.Flag] || scope.row.Flag}}
             </template>
           </el-table-column>
-          <el-table-column   prop="Editor"  width='80' label="制单人" >  </el-table-column>
-          <el-table-column  width='180'  label="审核日期" >
+          <el-table-column   prop="Editor"  width='70' label="制单人" >  </el-table-column>
+          <el-table-column  width='150' label="制单日期" >
             <template slot-scope="scope">
               <span>{{new Date(scope.row.EditDate) | parseTime('{y}-{m}-{d} {h}:{i}:{s}')}}</span>
             </template>
           </el-table-column>
           <el-table-column   prop="Operator"  label="操作人" ></el-table-column>
         </el-table>
-      </div>  
-      
-      <div class="pagination-container">
-        <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="curpage" :page-sizes="[10,20,30,50]" :page-size="page_size" layout="total, sizes, prev, pager, next, jumper" :total="total">
+         <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="curpage" :page-sizes="[10,20,30,50]" :page-size="page_size" layout="total, sizes, prev, pager, next, jumper" :total="total">
         </el-pagination>
-      </div>
+      </div> 
+      <div  class='right'>
+        <el-table class='fstable' ref="head" height="300"  highlight-current-row @current-change="handleCurSheetChange" v-loading="table_loading" :data="sheets1" >
+          <el-table-column   type="index"   width="30"> </el-table-column>
+          <el-table-column   prop="SheetID"  width='150' label="单号"  ></el-table-column>
+          <el-table-column   prop="AskType" width='60'  label="类型"  > 
+              <template slot-scope="scope">
+                {{scope.row.AskType | AskType_Desc}}
+              </template>
+          </el-table-column>
+          <el-table-column  width='60' label="状态"  >
+            <template slot-scope="scope">
+                {{Flag_Desc[scope.row.Flag] || scope.row.Flag}}
+            </template>
+          </el-table-column>
+          <el-table-column   prop="Editor"  width='70' label="制单人" >  </el-table-column>
+          <el-table-column  width='150'  label="审核日期" >
+            <template slot-scope="scope">
+              <span>{{new Date(scope.row.EditDate) | parseTime('{y}-{m}-{d} {h}:{i}:{s}')}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column   prop="Operator"  label="操作人" ></el-table-column>
+        </el-table>
+         <el-pagination background @size-change="handleSizeChange_x" @current-change="handleCurrentChange_x" :current-page="curpage_x" :page-sizes="[10,20,30,50]" :page-size="page_size_x" layout="total, sizes, prev, pager, next, jumper" :total="total_x">
+        </el-pagination>
+       </div>    
     </div>
 
     <div class='bottom'>
@@ -178,8 +177,11 @@ export default {
         num: [{ type: 'number', message: '必须为数字值'}, { required: true, message: '不能为空', trigger: 'blur' }],
       },
       curpage: 1,
+      curpage_x: 1,
       page_size: 10,
+      page_size_x: 10,
       total: 0,
+      total_x: 0,
       auth: 0,
       reviewDesc: ['一审','二审','三审'],
       curSheet: null,
@@ -195,13 +197,13 @@ export default {
     },
   },
   async created() {
-    console.log(process.env.SYS)
+    // console.log(process.env.SYS)
     await this.fetchData()
   },
   methods: {
     editDateParamChange(){
-      console.log(this.editDateParam)
-      console.log(this.sheetid)
+      // console.log(this.editDateParam)
+      // console.log(this.sheetid)
     },
     openEditForm(row){
        this.dialogFormVisible = true
@@ -214,7 +216,7 @@ export default {
      
     async fetchData() {
       const auth = await this.$store.dispatch('GetUserReviewAuth')
-      console.log(auth)
+      // console.log(auth)
       this.auth = auth
       const res = await this.$store.dispatch('GetCurShop')
       this.shops = res.sort((a,b)=>(a.value>b.value?1:(b.value >a.value? -1 : 0)))
@@ -232,13 +234,16 @@ export default {
       }
       return shopServerUrl
     },
-    async SearchSheet() {
+    async SearchSheet(ev, lrt) {
+       const lr = lrt || 2
+      this.items = []
+      this.logs = []
       if(!this.curshop) return       
       this.table_loading = true
-      const res = await this.$store.dispatch('GetSheetsQuery', { shopid: this.curshop, sheetid: this.sheetid, editDateS: this.editDateParam[0], editDateE: this.editDateParam[1], auth: this.auth, curpage: this.curpage || 1 , pagesize: this.page_size || 10, shopServerUrl: this.shopServerUrl })
+      console.log(this.editDateParam)
+      const res = await this.$store.dispatch('GetSheetsQuery', { shopid: this.curshop, sheetid: this.sheetid, editDateS: this.editDateParam[0], editDateE: this.editDateParam[1], auth: this.auth, curpage: this.curpage || 1 , pagesize: this.page_size || 10, curpage_x: this.curpage_x || 1 , pagesize_x: this.page_size_x || 10, shopServerUrl: this.shopServerUrl,lr })
       const sheets = res.fs
       const sheets1 = res.fs1
-      this.total = Math.max(res.total, res.total1)
       // if(sheets.length > 0){
       //   const sheetids = sheets.map(s=> s. SheetID)
       //   const reasons = await this.$store.dispatch('GetItemReason', { sheetids, auth: this.auth, shopServerUrl: this.shopServerUrl })
@@ -251,11 +256,18 @@ export default {
       //        s.reason = r //this.$set(s,'reason', r)
       //       }
       //   }
-      // }      
-      this.sheets = sheets
-      this.sheets1 = sheets1
+      // }   
+      console.log(lr)   
+      if(lr===2 || lr===0 ){
+        this.sheets = sheets
+        this.total = res.total
+      }
+      if(lr===2 || lr===1 ){
+        this.sheets1 = sheets1
+        this.total_x = res.total1
+      }     
       this.table_loading = false
-      this.$message.success('单据加载完成')           
+      this.$message.success('单据加载完成')     
     },    
     async handleCurSheetChange(curSheet) {
       this.curSheet = curSheet
@@ -288,11 +300,19 @@ export default {
     },
     handleSizeChange(val) {
       this.page_size = val
-      this.SearchSheet()
+      this.SearchSheet(null, 0)
     },
     handleCurrentChange(val) {
       this.curpage = val
-      this.SearchSheet()
+      this.SearchSheet(null, 0)
+    },
+    handleSizeChange_x(val) {
+      this.page_size_x = val
+      this.SearchSheet(null, 1)
+    },
+    handleCurrentChange_x(val) {
+      this.curpage_x = val
+      this.SearchSheet(null, 1)
     }
   }
 }
@@ -316,31 +336,16 @@ $light_gray:#fff;
   .top{
     border:2px solid beige;
     border-radius: 1px;
-    padding: 10px;
+    padding: 1px;
     display: flex; 
-    flex-flow: column;
-    .left{
-      border:2px solid beige;
-      border-radius: 1px;
-      padding: 10px;
-      flex-grow: 1;
-      min-width: 300px;
+    .left{     
       overflow-x: scroll;
-      .header{
-        display: flex;
-        justify-content: space-between;
-      }
+      flex:1;
     }
     .right{
-      border:2px solid beige;
-      border-radius: 1px;
-      padding: 10px;
-      flex-grow: 2;
       overflow-x: scroll;
-      .fstable{
-        border:2px solid beige;
-        border-radius: 1px;
-      }
+      border-left: 2px solid beige;
+      flex:1;
     }
   }
   .checkgroup{
