@@ -101,16 +101,16 @@
        
 
     
-<el-dialog title="修改订货数量" :visible.sync="dialogFormVisible"  width="35%">
-      <el-form :rules="rules" ref="dataForm" :model="temp" label-position="right" label-width="130px" >        
-      <el-form-item label="订货数" prop="num">
-        <el-input type="number" autofocus v-model.number="temp.num" placeholder='0.00' min="0.00" step="0.01" auto-complete="off"></el-input>
-      </el-form-item> 
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{$t('table.cancel')}}</el-button>
-        <el-button type="primary" @click="confirm">{{$t('table.confirm')}}</el-button>
-      </div>
+      <el-dialog title="修改订货数量" :visible.sync="dialogFormVisible"  width="35%">
+        <el-form @submit.native.prevent :rules="rules" ref="dataForm" :model="temp" label-position="right" label-width="130px" >        
+          <el-form-item label="订货数" prop="num">
+            <el-input type="number" autofocus v-model.number="temp.num" placeholder='0.00' min="0.00" step="0.01" auto-complete="off" @keyup.enter.native="confirm"></el-input>
+          </el-form-item> 
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">{{$t('table.cancel')}}</el-button>
+            <el-button type="primary" @click="confirm">{{$t('table.confirm')}}</el-button>
+          </div>
     </el-dialog>
   </div>
 </template>
