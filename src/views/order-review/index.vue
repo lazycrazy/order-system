@@ -9,9 +9,10 @@
       </el-option>
     </el-select>
     <el-select v-model="depts" multiple collapse-tags style="margin-left: 20px;width: 240px;" placeholder="请选择"> 
-          <el-option v-for="item in userdepts" :key="item.deptid" :label="item.deptid + ' - '+ item.deptname" :value="item.deptid"> 
-        </el-option>
-      </el-select>
+      <el-option v-for="item in userdepts" :key="item.deptid" :label="item.deptid + ' - '+ item.deptname" :value="item.deptid"> 
+      </el-option>
+    </el-select>
+    <el-input v-model="sheetid" placeholder="单号" style="width:200px"></el-input>
     <el-button type="primary" @click.native.prevent="handleShopChange">{{$t('table.search')}}</el-button> 
     {{auth}}审权限
     
@@ -62,8 +63,8 @@
        
           <el-tabs class='tab' value='first' type="border-card">
             <el-tab-pane label="明细" name="first">
-              <el-table fit :row-style="rowClass" class='items' v-loading="table_loading" :data="items" max-height='1000'  width='100%' >
-                <el-table-column type="index" width="50"></el-table-column>
+              <el-table fit :row-style="rowClass" class='items' v-loading="table_loading" :data="items" max-height='500'  width='100%' >
+                <el-table-column type="index" width="50" fixed></el-table-column>
                 <el-table-column label="编辑">
                    <template slot-scope="scope">
                     <el-button size="mini" type="danger" @click="openEditForm(scope.row)">编辑</el-button>
@@ -119,7 +120,7 @@ import { groupBy, chunkArray, parseTime } from '@/utils'
 import splitPane from 'vue-splitpane'
 
 const itemcols = ['reason','SheetID'
-,'serialid'
+// ,'serialid'
 ,'GoodsID'
 ,'PKNum'
 ,'Qty'
@@ -136,7 +137,7 @@ const itemcols = ['reason','SheetID'
 const itemcols_desc = 
 {'reason': '原因'
 ,'SheetID': '单号'
-,'serialid': '序号'
+// ,'serialid': '序号'
 ,'GoodsID': '商品ID'
 ,'PKNum': '件装数'
 ,'Qty': '数量'
@@ -162,6 +163,7 @@ export default {
       items: [],
       logs: [],
       shops: [],
+      sheetid: '',
       checkShops: [],
       curshop: null,
       shopGoods: [],
@@ -291,7 +293,7 @@ export default {
     // console.log(this.depts)
     // console.log(this.userdepts)
       const depts = this.depts.length > 0 ? this.depts : this.userdepts.map(d=> d.deptid)
-      const res = await this.$store.dispatch('GetSheets', { shopid: this.curshop, auth: this.auth, curpage: this.curpage || 1 , pagesize: this.page_size || 10, shopServerUrl: this.shopServerUrl, depts })
+      const res = await this.$store.dispatch('GetSheets', { shopid: this.curshop, auth: this.auth, curpage: this.curpage || 1 , pagesize: this.page_size || 10, shopServerUrl: this.shopServerUrl, depts, sheetid: this.sheetid })
       const sheets = res.fs
       this.total = res.total
       if(sheets.length > 0){

@@ -25,8 +25,13 @@
     <div class='top'>     
       <div class='left'> 
         <el-table ref="head" height="300" highlight-current-row @row-click="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
-          <el-table-column   type="index"   width="30"> </el-table-column>
+          <el-table-column   type="index"   width="40" fixed> </el-table-column>
           <el-table-column   prop="SheetID"  width='150' label="申请单号"  ></el-table-column>
+          <el-table-column  label="课" width='100'> 
+            <template slot-scope="scope">
+                {{ scope.row.kid + ' - ' + scope.row.kname }}
+              </template>
+          </el-table-column>
           <el-table-column   prop="AskType" width='60'  label="类型"  > 
               <template slot-scope="scope">
                 {{scope.row.AskType | AskType_Desc}}
@@ -50,8 +55,13 @@
       </div> 
       <div  class='right'>
         <el-table class='fstable' ref="head" height="300"  highlight-current-row @current-change="handleCurSheetChange" v-loading="table_loading" :data="sheets1" >
-          <el-table-column   type="index"   width="30"> </el-table-column>
+          <el-table-column   type="index"   width="40" fixed> </el-table-column>
           <el-table-column   prop="SheetID"  width='150' label="单号"  ></el-table-column>
+          <el-table-column  label="课"  width='100'> 
+            <template slot-scope="scope">
+                {{ scope.row.kid + ' - ' + scope.row.kname }}
+              </template>
+          </el-table-column>
           <el-table-column   prop="AskType" width='60'  label="类型"  > 
               <template slot-scope="scope">
                 {{scope.row.AskType | AskType_Desc}}
@@ -257,7 +267,7 @@ export default {
       //       }
       //   }
       // }   
-      console.log(lr)   
+      console.log(lr)     
       if(lr===2 || lr===0 ){
         this.sheets = sheets
         this.total = res.total

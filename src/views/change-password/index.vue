@@ -42,7 +42,7 @@ export default {
   data() {
     const validatePassword = (rule, value, callback) => {
       if (value.length < 4) {
-        callback(new Error('The password can not be less than 4 digits'))
+        callback(new Error('密码不能小于4位'))
       } else {
         callback()
       }

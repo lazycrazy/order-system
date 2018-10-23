@@ -21,13 +21,17 @@
       <span>店铺商品列表：</span>
       <el-button type="primary" @click.native.prevent="handleAdd">添加设置</el-button>
     </div>   
+    <div class='header'>
+      <el-input v-model="search_str" placeholder="输入商品查找"></el-input>
+      <el-button icon="el-icon-search" circle @click.native.prevent="handSearch"></el-button>
+    </div>
 
     <el-tree
       ref="tree"
       v-loading="tree_loading"
       :props="defaultProps"
       :data="shopGoods"
-      show-checkbox
+      show-checkbox 
       @check-change="handleCheckChange"
       @node-click="nodeclick" >
     </el-tree>
@@ -38,13 +42,13 @@
       <el-radio-button :label="2">二级审批</el-radio-button>
       <el-radio-button :label="3">三级审批</el-radio-button>
     </el-radio-group>
-    <el-tag  v-model="filterStr" v-if="filterStr" closable  :disable-transitions="false"
-  @close="handleCloseTag(tag)">  {{filterStr}} </el-tag>
+    <el-tag  v-model="filterStr" v-if="filterStr" closable  :disable-transitions="true"
+  @close="handleCloseTag">  {{filterStr}} </el-tag>
     <el-table class='fstable' 
     v-loading="table_loading"
     :data="functionSettings" >
     <el-table-column
-      type="index"
+      type="index" fixed
       width="50">
     </el-table-column>
      <el-table-column 
@@ -55,16 +59,16 @@
     </el-table-column>
     <el-table-column
       prop="barcodeid"
-      label="条码" width="180"/>
+      label="条码" width="130"/>
     </el-table-column>
     <el-table-column 
-        label="课" width='230'>
+        label="课" width='100'>
          <template slot-scope="scope">
         <span style="margin-left: 10px">{{ scope.row.kid +' - ' + scope.row.kname }}</span>
        </template>
       </el-table-column>
       <el-table-column 
-        label="小类" width='230'>
+        label="小类" width='200'>
          <template slot-scope="scope">
         <span style="margin-left: 10px">{{ scope.row.DeptId +' - ' + scope.row.deptname }}</span>
        </template>
@@ -179,6 +183,7 @@ export default {
       checkShops: [],
       curshop: null,
       curfunc: 1,
+      search_str: '',
       shopGoods: [],
       defaultProps: {
         children: 'children',
@@ -307,11 +312,11 @@ export default {
       this.table_loading = true
       let that = this      
       const res = await that.$store.dispatch('GetFunctionSetting', { shopid: that.curshop, funcid: that.curfunc, curpage: that.curpage || 1 , pagesize: that.page_size || 100, goodsid, deptid })
-      console.log('fs')
-      console.log(res)
+      // console.log('fs')
+      // console.log(res)
       that.functionSettings = res.fs
       that.total = res.total
-      console.log('fs loaded')
+      // console.log('fs loaded')
       that.table_loading = false
       that.$message.success('功能数据加载完成')           
     },
@@ -323,13 +328,48 @@ export default {
     },
     async nodeclick(nodedata){
        console.log(nodedata)
-       this.filterStr = typeDesc[nodedata.type - 1]+' - '+ nodedata.id
+       this.filterStr = typeDesc[nodedata.type - 1]+' - '+ nodedata.customno
        this.refreshFunctionSettings()
     },
-    async handleCloseTag(tag){
-       console.log(tag)
+    async handleCloseTag(){
+       // console.log(tag)
        this.filterStr = ''
        this.refreshFunctionSettings()       
+    },
+    getNodeByKey(arr, v) {
+      for (const n of arr) {
+        // console.log(n.label)
+        if(n.customno == v)
+          return n
+        if(n.children){
+          const node = this.getNodeByKey(n.children, v)
+          if(node)
+            return node
+        }
+      } 
+    },
+    async handSearch(){
+      const v = this.search_str.trim()
+      if(v){
+       const inode = this.getNodeByKey(this.shopGoods, v)
+       if(inode){
+          this.$notify.info({
+            title: '消息',
+            dangerouslyUseHTMLString: true,
+            message: inode.label + "<br>小类："+ inode.goods_deptid
+          });
+          // console.log(this.$refs.tree)
+          // console.log(inode)
+          // var b= this.$refs.tree.children.findIndex(c=>c.id == inode.goods_deptid.toString().substring(0,1))
+          // console.log(b)
+          // this.$refs.tree.$children[b].$el.click()
+           this.filterStr = typeDesc[5] + ' - ' + this.search_str
+           this.refreshFunctionSettings()
+       }else{
+         this.$message.warning('未找到')
+       }
+       
+      }   
     },
     handleSizeChange(val) {
       this.page_size = val
@@ -456,8 +496,7 @@ $light_gray:#fff;
       border-radius: 1px;
       padding: 10px;
       flex-grow: 1;
-      min-width: 300px;
-      overflow-x: scroll;
+      min-width: 400px;
       .header{
         display: flex;
         justify-content: space-between;

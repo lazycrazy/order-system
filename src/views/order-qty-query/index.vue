@@ -25,7 +25,7 @@
  
     <div class='top'>      
 
-      <el-table fit  class='fstable' ref="head" height="400" highlight-current-row  v-loading="table_loading" :data="sheets" >
+      <el-table fit  class='fstable' ref="head" height="600" highlight-current-row  v-loading="table_loading" :data="sheets" >
         <el-table-column   type="index"   width="50"> </el-table-column>
         <el-table-column   label="店铺"  > 
            <template slot-scope="scope">
