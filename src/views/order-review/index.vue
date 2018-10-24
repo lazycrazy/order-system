@@ -22,7 +22,7 @@
           <el-table-column   type="index"   width="50"> </el-table-column>
           <el-table-column  prop="ShopName"   label="店铺" width='190'></el-table-column>     
           <el-table-column   prop="SheetID"  width='160' label="单号"  ></el-table-column>
-          <el-table-column  label="课" > 
+          <el-table-column  label="课" width='100'> 
             <template slot-scope="scope">
                 {{ scope.row.kid + ' - ' + scope.row.kname }}
               </template>
@@ -43,7 +43,7 @@
               <span>{{new Date(scope.row.EditDate) | parseTime('{y}-{m}-{d} {h}:{i}:{s}')}}</span>
             </template>
           </el-table-column>
-          <el-table-column   prop="Operator"  label="操作人" ></el-table-column>
+          <el-table-column   prop="Operator"  label="操作人" width='100'></el-table-column>
           <el-table-column width='190' label="审批">
             <template slot-scope="scope">
               <el-button size="mini" type="danger" v-if="canReview(1, scope.row)" @click="review(1, scope.row)">{{reviewDesc[0]}}</el-button>

@@ -339,7 +339,7 @@ export default {
     getNodeByKey(arr, v) {
       for (const n of arr) {
         // console.log(n.label)
-        if(n.customno == v)
+        if(n.customno.trim().replace(/^0+/, '') == v.replace(/^0+/, ''))
           return n
         if(n.children){
           const node = this.getNodeByKey(n.children, v)

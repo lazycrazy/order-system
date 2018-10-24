@@ -37,7 +37,7 @@
             <span>{{ scope.row.editdate }}</span>
           </template>
         </el-table-column> 
-        <el-table-column  prop="SheetID"   label="课"  > 
+        <el-table-column  prop="SheetID"   label="课" width='100' > 
            <template slot-scope="scope">
             <span>{{ scope.row.kid + ' - ' + scope.row.kname }}</span>
           </template>
