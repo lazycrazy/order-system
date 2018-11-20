@@ -258,7 +258,7 @@ export default {
       return can
     },
     canNextReview(auth, row){
-      const can = this.auth === auth && row.reason
+      const can = this.auth === auth && row.reason && !row.reason.endsWith('不允许订货')
       return can
     },
     canReject(row){

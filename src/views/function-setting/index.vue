@@ -100,8 +100,12 @@
       label="每日最大订货额"
       >
     </el-table-column>
-    <el-table-column label="删除">
+    <el-table-column label="操作" width='150'>
        <template slot-scope="scope">
+        <el-button
+          size="mini"
+          type="danger"
+          @click="handleModify(scope.row)">修改</el-button>
         <el-button
           size="mini"
           type="danger"
@@ -140,6 +144,33 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{$t('table.cancel')}}</el-button>
         <el-button type="primary" @click="confirm">{{$t('table.confirm')}}</el-button>
+      </div>
+    </el-dialog>
+
+     <el-dialog title="修改属性值" :visible.sync="dialogFormVisible_M"  width="35%">
+      <el-form :rules="rules" ref="dataForm_M" :model="temp" label-position="right" label-width="130px" >
+        <el-form-item label="商品" prop="item">
+      <el-input type="string" v-model.number="temp.item" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="最大订货倍数" prop="multiple">
+      <el-input type="number" v-model.number="temp.multiple" placeholder='0.00' min="0.00" step="0.01" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="最大订货数" prop="num">
+      <el-input type="number" v-model.number="temp.num" placeholder='0.00' min="0.00" step="0.01" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="最大订货金额" prop="amt">
+      <el-input type="number" v-model.number="temp.amt" placeholder='0.00' min="0.00" step="0.01" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="每日最大订货数" prop="day_limit_num">
+      <el-input type="number" v-model.number="temp.day_limit_num" placeholder='0.00' min="0.00" step="0.01" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="每日最大订货金额" prop="day_limit_amt">
+      <el-input type="number" v-model.number="temp.day_limit_amt" placeholder='0.00' min="0.00" step="0.01" auto-complete="off"></el-input>
+        </el-form-item>         
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible_M = false">{{$t('table.cancel')}}</el-button>
+        <el-button type="primary" @click="confirm_M">{{$t('table.confirm')}}</el-button>
       </div>
     </el-dialog>
        
@@ -192,6 +223,8 @@ export default {
       tree_loading: false,
       table_loading: false,
       temp: {
+        goodsid: null,
+        item: '',
         multiple: 0.00,
         num: 0.00,
         amt: 0.00,
@@ -199,6 +232,7 @@ export default {
         day_limit_amt: 0.00
       },
       dialogFormVisible: false,
+      dialogFormVisible_M: false,
       dialogSelectShopVisible: false,
       rules: {
         multiple: [{ type: 'number', message: '必须为数字值'}],
@@ -391,6 +425,8 @@ export default {
       }
 
       this.temp = {
+        goodsid: null,
+        item: '',
         multiple: 0.00,
         num: 0.00,
         amt: 0.00,
@@ -400,6 +436,24 @@ export default {
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
+      })
+      // this.$refs.tree.setCheckedKeys([3]);
+      // this.$refs.tree.setCheckedKeys([]);
+    },
+    handleModify(row) {
+      // console.log(row)
+      this.temp = {
+        goodsid: row.GoodsId,
+        item: row.customno.trim() + ' - ' + row.goodsname,
+        multiple: row.ordermultiple,
+        num: row.OrderNum,
+        amt: row.OrderAmt,
+        day_limit_num: row.DayUpperlimit,
+        day_limit_amt: row.DayUpperlimitAmt
+      }
+      this.dialogFormVisible_M = true
+      this.$nextTick(() => {
+        this.$refs['dataForm_M'].clearValidate()
       })
       // this.$refs.tree.setCheckedKeys([3]);
       // this.$refs.tree.setCheckedKeys([]);
@@ -452,6 +506,33 @@ export default {
           console.log(res)
           await this.refreshFunctionSettings()
           that.dialogFormVisible = false
+          that.$notify({
+            title: '成功',
+            message: '设置成功',
+            type: 'success',
+            duration: 2000
+          })
+          // })
+        }
+      })
+    },
+    confirm_M() {
+      const that = this
+      this.$refs['dataForm_M'].validate(async (valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, that.temp)
+          const obj = {shopid: that.curshop, functionid: that.curfunc, multiple: tempData.multiple, num: tempData.num, amt: tempData.amt, limitnum: tempData.day_limit_num, limitamt: tempData.day_limit_amt, iids: null, uids: null}
+          obj.iids = []
+          obj.uids = [[tempData.goodsid]]
+          // console.log(ids.length)
+          // console.log(obj.iids.length)
+          // console.log(obj.uids.length)
+           
+          // console.log(obj)
+          const res = await that.$store.dispatch('SetFunctionSetting', obj)
+          console.log(res)
+          await this.refreshFunctionSettings()
+          that.dialogFormVisible_M = false
           that.$notify({
             title: '成功',
             message: '设置成功',
