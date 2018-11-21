@@ -74,6 +74,21 @@ export function updateItem(data) {
   })
 }
 
+export function deleteItem(data) {
+  if(data.shopServerUrl){
+    return requestSC(data.shopServerUrl)({
+      url: `/purchase/deleteItemAndLog`,
+      method: 'post',
+      data
+    })
+  }
+  return request({
+    url: `/purchase/deleteItemAndLog`,
+    method: 'post',
+    data
+  })
+}
+
 export function reviewSheet(data) {
   if(data.shopServerUrl){
     return requestSC(data.shopServerUrl)({

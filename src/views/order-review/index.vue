@@ -65,8 +65,9 @@
             <el-tab-pane label="明细" name="first">
               <el-table fit :row-style="rowClass" class='items' v-loading="table_loading" :data="items" max-height='500'  width='100%' >
                 <el-table-column type="index" width="50" fixed></el-table-column>
-                <el-table-column label="编辑">
+                <el-table-column label="操作" width="150">
                    <template slot-scope="scope">
+                    <el-button size="mini" type="danger" @click="deleteRow(scope.row)">删除</el-button>
                     <el-button size="mini" type="danger" @click="openEditForm(scope.row)">编辑</el-button>
                   </template>
                 </el-table-column>
@@ -156,6 +157,13 @@ export default {
   name: 'orderReview',
   components: { splitPane },
   data() {
+    var validateNum = (rule, value, callback) => {
+        if (value <= 0) {
+          callback(new Error('數量必须大于0'));
+        } else {        
+          callback();
+        }
+      }
     return {
       IsHQ : process.env.SYS === "HQ",
       itemcols,Flag_Desc,itemcols_desc,
@@ -178,7 +186,7 @@ export default {
       },
       dialogFormVisible: false,
       rules: {
-        num: [{ type: 'number', message: '必须为数字值'}, { required: true, message: '不能为空', trigger: 'blur' }],
+        num: [{ type: 'number', message: '必须为数字值'}, { required: true, message: '不能为空', trigger: 'blur' }, {validator: validateNum, trigger: 'blur' }],
       },
       curpage: 1,
       page_size: 10,
@@ -216,6 +224,32 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
+    deleteRow(row){
+      this.$prompt('请输入原因', '删除', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputPattern: /.{3,50}/,
+          inputErrorMessage: '格式不正确,3-50个长度'
+        }).then(async ({ value }) => { 
+
+          const obj = {sheetid: row.SheetID, goodsid: row.GoodsID,  desc:"删除 - " + value, shopServerUrl: this.shopServerUrl }           
+          const res = await this.$store.dispatch('DeleteItem', obj)
+          // console.log(res)
+          await this.handleCurSheetChange(this.curSheet)
+          
+          this.$notify({
+            title: '成功',
+            message: '删除' + '成功',
+            type: 'success',
+            duration: 2000
+          })         
+        }).catch((err) => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'+ err
+          })
+        })    
+    },
     async review(auth, row){
       const resl = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: this.reviewDesc[auth - 1], auth })
       // console.log(resl)
@@ -233,20 +267,32 @@ export default {
       await this.SearchSheet()
     },
     async reject(row){
-      const resl = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: '驳回', auth: -(this.auth + 99) })
+       this.$prompt('请输入原因', '驳回', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputPattern: /.{3,50}/,
+          inputErrorMessage: '格式不正确,3-50个长度'
+        }).then(async ({ value }) => { 
+          const resl = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: '驳回 - ' + value, auth: -(this.auth + 99) })
       // console.log(resl)
-      const res = await this.$store.dispatch('RejectSheet', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID })
-      // console.log(res)
-      this.$notify({
-        title: '成功',
-        message: '驳回' + '成功',
-        type: 'success',
-        duration: 2000
-      })
-      this.curSheet = null
-      this.items = []
-      this.logs = []
-      await this.SearchSheet()
+          const res = await this.$store.dispatch('RejectSheet', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID })
+          // console.log(res)
+          this.$notify({
+            title: '成功',
+            message: '驳回' + '成功',
+            type: 'success',
+            duration: 2000
+          })
+          this.curSheet = null
+          this.items = []
+          this.logs = []
+          await this.SearchSheet()          
+        }).catch((err) => {
+          this.$message({
+            type: 'info',
+            message: '已取消驳回'+err
+          })
+        })    
     },
     async logNext(auth, row){
       const res = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: this.reviewDesc[auth - 1]+" -> 下一级审批", auth: -(auth + 10) })

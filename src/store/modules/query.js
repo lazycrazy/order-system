@@ -20,6 +20,7 @@ import {
   reviewSheet,
   rejectSheet,
   updateItem,
+  deleteItem,
   getGoodsIdBySF,
   getShopServerInfos,
   getShopServerUrl,
@@ -73,6 +74,10 @@ const query = {
     },
     async UpdateItem({ commit }, data) {
       const res = await updateItem(data)
+      return res.data
+    },
+    async DeleteItem({ commit }, data) {
+      const res = await deleteItem(data)
       return res.data
     },
     async SetSheetLog({ commit }, data) {
