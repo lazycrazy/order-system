@@ -1,5 +1,5 @@
 <template>
-  <div class="login-container">
+  <div class="login-container-a">
       <el-form class="login-form" autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left">
       <el-form-item prop="old">
         <span class="svg-container">
@@ -99,34 +99,18 @@ export default {
 
 
 
-
-<style rel="stylesheet/scss" lang="scss">
-$bg:#2d3a4b;
-
-
-/* reset element-ui css */
-.login-container {
-  .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    color: #454545;
-  }
-}
-
-</style>
+ 
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 
 $dark_gray:#889aa4;
 $light_gray:#fff;
-.login-container {
+.login-container-a {
   .el-input {
     display: inline-block;
     height: 47px;
     width: 80%;
     input {
-      background: transparent;
       border: 0px;
       -webkit-appearance: none;
       border-radius: 0px;

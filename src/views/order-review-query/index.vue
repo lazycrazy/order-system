@@ -24,7 +24,7 @@
  
     <div class='top'>     
       <div class='left'> 
-        <el-table ref="head" height="300" highlight-current-row @row-click="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
+        <el-table ref="headleft" height="300" highlight-current-row @row-click="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
           <el-table-column   type="index"   width="40" fixed> </el-table-column>
           <el-table-column   prop="SheetID"  width='150' label="申请单号"  ></el-table-column>
           <el-table-column  label="课" width='100'> 
@@ -54,7 +54,7 @@
         </el-pagination>
       </div> 
       <div  class='right'>
-        <el-table class='fstable' ref="head" height="300"  highlight-current-row @current-change="handleCurSheetChange" v-loading="table_loading" :data="sheets1" >
+        <el-table class='fstable' ref="headright" height="300"  highlight-current-row @current-change="handleCurSheetChange" v-loading="table_loading" :data="sheets1" >
           <el-table-column   type="index"   width="40" fixed> </el-table-column>
           <el-table-column   prop="SheetID"  width='150' label="单号"  ></el-table-column>
           <el-table-column  label="课"  width='100'> 
@@ -86,9 +86,9 @@
     </div>
 
     <div class='bottom'>
-      <el-tabs class='tab' value='second' type="border-card">
+      <el-tabs class='tab' value='second' type="border-card" @tab-click='doLayout'>
         <el-tab-pane label="明细" name="first">
-          <el-table fit height="250" class='items' v-loading="table_loading" :data="items" max-height='500'  width='100%' >
+          <el-table fit ref='bottomleft' height="250" class='items' v-loading="table_loading" :data="items" max-height='500'  width='100%' >
             <el-table-column type="index" width="50"></el-table-column>
              <el-table-column label="商品" width='250'>
               <template slot-scope="scope">
@@ -104,15 +104,15 @@
           </el-table>
         </el-tab-pane>
         <el-tab-pane  label="日志" name="second">
-          <el-table fit height="250" class='logs' v-loading="table_loading":data="logs" width='100%' >
+          <el-table height="250" ref='bottomright' class='logs' v-loading="table_loading" :data="logs" width='100%' >
             <el-table-column type="index" width="50"></el-table-column>      
-            <el-table-column label="记录时间" width='150'>
+            <el-table-column label="记录时间" width='160'>
               <template slot-scope="scope">
                 <span>{{new Date(scope.row.LogTime) | parseTime('{y}-{m}-{d} {h}:{i}:{s}')}}</span>
               </template>
             </el-table-column>
             <el-table-column prop="LogUser" label="操作人"></el-table-column>   
-            <el-table-column prop="LogDesc" label="描述"></el-table-column>
+            <el-table-column prop="LogDesc" width='250' label="描述"></el-table-column>
             <el-table-column prop="GoodsID" label="商品ID"></el-table-column>
             <el-table-column prop="Qty" label="数量"></el-table-column>
           </el-table>
@@ -214,6 +214,13 @@ export default {
     editDateParamChange(){
       // console.log(this.editDateParam)
       // console.log(this.sheetid)
+    },
+    doLayout(tab) {
+       if(tab.name === 'first') {
+         this.$refs.bottomleft.doLayout();
+       } else {
+         this.$refs.bottomright.doLayout();
+       }
     },
     openEditForm(row){
        this.dialogFormVisible = true
