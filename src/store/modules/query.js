@@ -29,7 +29,8 @@ import {
   getOriginQty,
   getUserInfo,
   getUserDepts,
-  syncMaster
+  syncMaster,
+  getFSExport
 } from '@/api/query'
 
 const query = {
@@ -46,6 +47,10 @@ const query = {
     },  
     async GetUserDepts({ commit }) {
       const res = await getUserDepts()
+      return res.data
+    }, 
+    async GetFSExport({ commit }, data) {
+      const res = await getFSExport(data)
       return res.data
     },  
     async SearchUserInfo({ commit }) {

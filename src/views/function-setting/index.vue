@@ -14,6 +14,8 @@
     <input ref='import' type="file" @change="fsImport1" accept=".csv" v-show='false'/>
     导入
   </label>
+  <el-button type="primary" @click.native.prevent="fsExport">导出</el-button>
+
 
 <div class='content'>
   <div class='left'>
@@ -22,19 +24,21 @@
       <el-button type="primary" @click.native.prevent="handleAdd">添加设置</el-button>
     </div>   
     <div class='header'>
-      <el-input v-model="search_str" placeholder="输入商品查找"></el-input>
+      <el-input v-model="search_str" placeholder="输入商品查找" @keyup.enter.native="handSearch"></el-input>
       <el-button icon="el-icon-search" circle @click.native.prevent="handSearch"></el-button>
+      <el-button icon="el-icon-remove-outline" circle @click.native.prevent="collapseAll"></el-button>
     </div>
-
-    <el-tree
-      ref="tree"
-      v-loading="tree_loading"
-      :props="defaultProps"
-      :data="shopGoods"
-      show-checkbox 
-      @check-change="handleCheckChange"
-      @node-click="nodeclick" >
-    </el-tree>
+    <div class='bottom'>    
+      <el-tree height='800'
+        ref="tree" node-key="uid" :default-expanded-keys="expandedKeys"
+        v-loading="tree_loading"
+        :props="defaultProps"
+        :data="shopGoods"
+        show-checkbox 
+        @check-change="handleCheckChange"
+        @node-click="nodeclick" >
+      </el-tree>
+    </div>
 </div>
   <div class='right'>
      <el-radio-group v-model="curfunc" @change="handleFunctionChange()">
@@ -44,7 +48,7 @@
     </el-radio-group>
     <el-tag  v-model="filterStr" v-if="filterStr" closable  :disable-transitions="true"
   @close="handleCloseTag">  {{filterStr}} </el-tag>
-    <el-table class='fstable' 
+    <el-table class='fstable'  height='500'
     v-loading="table_loading"
     :data="functionSettings" >
     <el-table-column
@@ -201,6 +205,7 @@
 <script>
 import { groupBy, chunkArray } from '@/utils'
 
+
 const typeDesc=['部','课','大类','中类','小类','商品']
 export default {
   name: 'functionSetting',
@@ -220,6 +225,7 @@ export default {
         children: 'children',
         label: 'label'
       },
+      expandedKeys: [],
       tree_loading: false,
       table_loading: false,
       temp: {
@@ -272,28 +278,76 @@ export default {
           const srows = rows.map(r => {
             const strs = r.split(',')
             const o = strs.reduce((acc, cur, i) => { 
+              if(i > 7 ) return acc
               acc['Col'+(i+1)] = cur
               return acc
               },{})
             return o
           })
-          // console.log(srows)
-         const batchRows = chunkArray(srows, 2000)
+        const batchRows = chunkArray(srows, 2000)
+        // console.log(batchRows)
         self.$message.warning(`数据太大分${batchRows.length}次导入,2000/每次`)
         let ucount = 0
         let icount = 0
+        let num = 1
          for(let nrows of batchRows){
           //发送到服务端
            const res = await self.$store.dispatch('FunctionSettingImport', { data: nrows}) 
             // console.log(res)
             ucount = ucount + res[0]
             icount = icount + res[1]
-            self.$message.success(`更新：${res[0]}条，新增：${res[1]}条`)
+            self.$message.success(`${num++}更新：${res[0]}条，新增：${res[1]}条`)
          }
          self.$message.success(`总共更新：${ucount}条，新增：${icount}条`)
       }
       reader.readAsText(file)    
       this.$refs['import'].value = null
+    },
+    arrayToCsv(data, args = {}) {
+      let columnDelimiter = args.columnDelimiter || ',';
+      let lineDelimiter = args.lineDelimiter || '\n';
+      const cols =["审批功能号","店铺号","商品ID","最大订货倍数","最大订货数","最大订货金额","每日最大订货数","每日最大订货金额","商品名","课","小类","进价","最小订货数"]
+       return cols.join(columnDelimiter) + lineDelimiter + data.reduce((csv, row) => {
+         const rowContent = cols.reduce((rowTemp, col) => {
+          let ret = rowTemp ? rowTemp + columnDelimiter : rowTemp;
+          let formatedCol = row[col].toString().trim().replace(new RegExp(lineDelimiter, 'g'), ' ');
+          ret += /,/.test(formatedCol) ? `"${formatedCol}"` : formatedCol;
+          return ret;
+        }, '')
+        return (csv ? csv + lineDelimiter : '') + rowContent;
+      }, '');
+    },
+    async fsExport() {
+      console.log('export')
+      this.$confirm('确认导出?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          
+          const rs = await this.$store.dispatch('GetFSExport',{curshop: this.curshop})
+          const csv = this.arrayToCsv(rs);
+          const BOM = '\uFEFF'; 
+          let url = window.URL.createObjectURL(new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' }))
+          let link = document.createElement('a')
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', this.curshop + '.csv')
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link);
+
+          this.$message({
+            type: 'success',
+            message: '导出成功!'
+          });
+        }).catch((e) => {
+          console.log(e)
+          this.$message({
+            type: 'info',
+            message: '已取消导出'+ e
+          });          
+        });
     },
     async fetchData() { 
       const type_shops = await this.$store.dispatch('GetShopTypes')
@@ -370,27 +424,40 @@ export default {
        this.filterStr = ''
        this.refreshFunctionSettings()       
     },
-    getNodeByKey(arr, v) {
+    getNodeByKey(arr, v, rs, cn) {
       for (const n of arr) {
         // console.log(n.label)
-        if(n.customno.trim().replace(/^0+/, '') == v.replace(/^0+/, ''))
-          return n
+        if(cn){
+          if(n.label.indexOf(v) >= 0){
+            rs.push(n) 
+          }
+        }
+        else if(n.customno.trim().replace(/^0+/, '') == v.replace(/^0+/, '')){
+          rs.push(n)
+          return
+        }
+
         if(n.children){
-          const node = this.getNodeByKey(n.children, v)
+          const node = this.getNodeByKey(n.children, v, rs, cn)
           if(node)
             return node
         }
       } 
     },
     async handSearch(){
+     // this.expandedKeys = ['682866', '5315001','42011']
+      // console.log(this.$refs.tree.defaultExpandedKeys)
       const v = this.search_str.trim()
+      const rs = []
       if(v){
-       const inode = this.getNodeByKey(this.shopGoods, v)
-       if(inode){
+       this.getNodeByKey(this.shopGoods, v, rs, /[\u4E00-\u9FA5\uF900-\uFA2D]/.test(v))
+       this.expandedKeys = rs.map(n=>n.uid)
+       // console.log(this.expandedKeys)
+       if(rs.length === 1){
           this.$notify.info({
             title: '消息',
             dangerouslyUseHTMLString: true,
-            message: inode.label + "<br>小类："+ inode.goods_deptid
+            message: rs[0].label + "<br>小类："+ rs[0].goods_deptid
           });
           // console.log(this.$refs.tree)
           // console.log(inode)
@@ -399,6 +466,12 @@ export default {
           // this.$refs.tree.$children[b].$el.click()
            this.filterStr = typeDesc[5] + ' - ' + this.search_str
            this.refreshFunctionSettings()
+       } else if(rs.length > 1){
+          this.$notify.info({
+            title: '消息',
+            dangerouslyUseHTMLString: true,
+            message: '查找到' + rs.length + '个'
+          });
        }else{
          this.$message.warning('未找到')
        }
@@ -457,6 +530,12 @@ export default {
       })
       // this.$refs.tree.setCheckedKeys([3]);
       // this.$refs.tree.setCheckedKeys([]);
+    },
+    collapseAll(){
+       for(let n of Object.values(this.$refs.tree.store.nodesMap)){
+         if(n.data.type < 6 && n.expanded)
+           n.expanded = false
+       }
     },
     handleCheckChange() {
       //console.log(arguments);      
@@ -566,6 +645,10 @@ $light_gray:#fff;
     font-size: 14px;
     color: grey;
   }
+  .bottom{
+    overflow-x: scroll;
+    max-height: 600px;
+  }
   .content{
     border:2px solid beige;
     border-radius: 1px;
@@ -576,6 +659,7 @@ $light_gray:#fff;
       border:2px solid beige;
       border-radius: 1px;
       padding: 10px;
+
       flex-grow: 1;
       min-width: 400px;
       .header{

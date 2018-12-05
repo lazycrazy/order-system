@@ -15,6 +15,14 @@ export function getUserInfo() {
   })
 }
 
+export function getFSExport(data) {
+  return request({
+    url: `/query/fsExport`,
+    method: 'post',
+    data
+  })
+}
+
 export function getUserDepts() {
   return request({
     url: `/query/userDepts`,
