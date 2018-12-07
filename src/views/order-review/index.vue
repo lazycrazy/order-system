@@ -246,25 +246,35 @@ export default {
         }).catch((err) => {
           this.$message({
             type: 'info',
-            message: '已取消删除'+ err
+            message: 'cancel'===err?'已取消删除':"删除失败," + err
           })
         })    
     },
     async review(auth, row){
-      const resl = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: this.reviewDesc[auth - 1], auth })
-      // console.log(resl)
-      const res = await this.$store.dispatch('ReviewSheet', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID })
-      console.log(res)
-      this.$notify({
-        title: '成功',
-        message: this.reviewDesc[auth - 1] + '成功',
-        type: 'success',
-        duration: 2000
-      })
-      this.curSheet = null
-      this.items = []
-      this.logs = []
-      await this.SearchSheet()
+      this.$confirm('确认审批?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          const resl = await this.$store.dispatch('SetSheetLog', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID, desc: this.reviewDesc[auth - 1], auth })
+          // console.log(resl)
+          const res = await this.$store.dispatch('ReviewSheet', { shopServerUrl: this.shopServerUrl, sheetid: row.SheetID })
+          this.$notify({
+            title: '成功',
+            message: this.reviewDesc[auth - 1] + '成功',
+            type: 'success',
+            duration: 2000
+          })
+          this.curSheet = null
+          this.items = []
+          this.logs = []
+          await this.SearchSheet()
+        }).catch((e) => {
+          this.$message({
+            type: 'info',
+            message: 'cancel'===e?'已取消审批':"审批失败," + e
+          });          
+        });      
     },
     async reject(row){
        this.$prompt('请输入原因', '驳回', {
