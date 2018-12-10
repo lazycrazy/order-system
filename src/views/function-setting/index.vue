@@ -89,7 +89,7 @@
       </el-table-column>
       <el-table-column
       prop="OrderNum"
-      label="最大订货数"
+      label="最大促销订货倍数"
       ></el-table-column>
       <el-table-column
       prop="OrderAmt"
@@ -132,7 +132,7 @@
         <el-form-item label="最大订货倍数" prop="multiple">
       <el-input type="number" v-model.number="temp.multiple" placeholder='0.00' min="0.00" step="0.01" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="最大订货数" prop="num">
+        <el-form-item label="最大促销订货倍数" prop="num">
       <el-input type="number" v-model.number="temp.num" placeholder='0.00' min="0.00" step="0.01" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="最大订货金额" prop="amt">
@@ -159,7 +159,7 @@
         <el-form-item label="最大订货倍数" prop="multiple">
       <el-input type="number" v-model.number="temp.multiple" placeholder='0.00' min="0.00" step="0.01" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="最大订货数" prop="num">
+        <el-form-item label="最大促销订货倍数" prop="num">
       <el-input type="number" v-model.number="temp.num" placeholder='0.00' min="0.00" step="0.01" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="最大订货金额" prop="amt">
@@ -306,7 +306,7 @@ export default {
     arrayToCsv(data, args = {}) {
       let columnDelimiter = args.columnDelimiter || ',';
       let lineDelimiter = args.lineDelimiter || '\n';
-      const cols =["审批功能号","店铺号","商品ID","最大订货倍数","最大订货数","最大订货金额","每日最大订货数","每日最大订货金额","商品名","课","小类","进价","最小订货数"]
+      const cols =["审批功能号","店铺号","商品ID","最大订货倍数","最大促销订货倍数","最大订货金额","每日最大订货数","每日最大订货金额","商品名","课","小类","进价","最小订货数"]
        return cols.join(columnDelimiter) + lineDelimiter + data.reduce((csv, row) => {
          const rowContent = cols.reduce((rowTemp, col) => {
           let ret = rowTemp ? rowTemp + columnDelimiter : rowTemp;
@@ -318,7 +318,6 @@ export default {
       }, '');
     },
     async fsExport() {
-      console.log('export')
       this.$confirm('确认导出?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -342,10 +341,9 @@ export default {
             message: '导出成功!'
           });
         }).catch((e) => {
-          console.log(e)
           this.$message({
             type: 'info',
-            message: '已取消导出'+ e
+            message: 'cancel'==e? '已取消导出' :'导出失败,'+ e
           });          
         });
     },
@@ -541,13 +539,25 @@ export default {
       //console.log(arguments);      
     },
     async handleDelete(row){
-      const rs = await this.$store.dispatch('DeleteFunctionSetting', {shopid: row.ShopId
-, functionid: row.FunctionId, goodsid: row.GoodsId})
-      await this.refreshFunctionSettings()
-      this.$message({
-        message: '删除成功',
-        type: 'success'
-      })
+      this.$confirm('确认删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          const rs = await this.$store.dispatch('DeleteFunctionSetting', {shopid: row.ShopId
+                      , functionid: row.FunctionId, goodsid: row.GoodsId})
+          await this.refreshFunctionSettings()
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          }) 
+        }).catch((e) => {
+          this.$message({
+            type: 'info',
+            message: 'cancel' == e ? '已取消删除' : '删除失败,' + e
+          });          
+        });       
+      
     },
     async confirmShops() { 
       if(this.checkShops.length ===0) return
