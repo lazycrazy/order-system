@@ -22,6 +22,20 @@ export function getFSExport(data) {
     data
   })
 }
+export function getQTYExport(data) {
+  if(data.shopServerUrl){
+    return requestSC(data.shopServerUrl)({
+      url: `/query/qtyExport`,
+      method: 'post',
+      data
+    })
+  }
+  return request({
+    url: `/query/qtyExport`,
+    method: 'post',
+    data
+  })
+}
 
 export function getUserDepts() {
   return request({

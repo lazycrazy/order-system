@@ -18,29 +18,33 @@
 
 
 <div class='content'>
-  <div class='left'>
-    <div class='header'>
-      <span>店铺商品列表：</span>
-      <el-button type="primary" @click.native.prevent="handleAdd">添加设置</el-button>
-    </div>   
-    <div class='header'>
-      <el-input v-model="search_str" placeholder="输入商品查找" @keyup.enter.native="handSearch"></el-input>
-      <el-button icon="el-icon-search" circle @click.native.prevent="handSearch"></el-button>
-      <el-button icon="el-icon-remove-outline" circle @click.native.prevent="collapseAll"></el-button>
-    </div>
-    <div class='bottom'>    
-      <el-tree height='800'
-        ref="tree" node-key="uid" :default-expanded-keys="expandedKeys"
-        v-loading="tree_loading"
-        :props="defaultProps"
-        :data="shopGoods"
-        show-checkbox 
-        @check-change="handleCheckChange"
-        @node-click="nodeclick" >
-      </el-tree>
-    </div>
-</div>
-  <div class='right'>
+  <split-pane class="splitpane" :min-percent='20' :default-percent='30' split="vertical">
+      <template slot="paneL">
+        <div class='left'>
+        <div class='header'>
+          <span>店铺商品列表：</span>
+          <el-button type="primary" @click.native.prevent="handleAdd">添加设置</el-button>
+        </div>   
+        <div class='header'>
+          <el-input v-model="search_str" placeholder="输入商品查找" @keyup.enter.native="handSearch"></el-input>
+          <el-button icon="el-icon-search" circle @click.native.prevent="handSearch"></el-button>
+          <el-button icon="el-icon-remove-outline" circle @click.native.prevent="collapseAll"></el-button>
+        </div>
+        <div class='bottom'>    
+          <el-tree height='800'
+            ref="tree" node-key="uid" :default-expanded-keys="expandedKeys"
+            v-loading="tree_loading"
+            :props="defaultProps"
+            :data="shopGoods"
+            show-checkbox 
+            @check-change="handleCheckChange"
+            @node-click="nodeclick" >
+          </el-tree>
+        </div>
+      </div>
+      </template>
+      <template slot="paneR">
+        <div class='right'>
      <el-radio-group v-model="curfunc" @change="handleFunctionChange()">
       <el-radio-button :label="1">一级审批</el-radio-button>
       <el-radio-button :label="2">二级审批</el-radio-button>
@@ -48,7 +52,7 @@
     </el-radio-group>
     <el-tag  v-model="filterStr" v-if="filterStr" closable  :disable-transitions="true"
   @close="handleCloseTag">  {{filterStr}} </el-tag>
-    <el-table class='fstable'  height='500'
+    <el-table class='fstable'  height='600'
     v-loading="table_loading"
     :data="functionSettings" >
     <el-table-column
@@ -123,6 +127,11 @@
       </el-pagination>
     </div>
   </div>
+      </template>
+  </split-pane>
+
+  
+  
 
 </div>
     
@@ -180,8 +189,8 @@
        
 
   <el-dialog title="选择应用同样设置的店" :visible.sync="dialogSelectShopVisible"  width="30%">
-       
-          店型组：
+       <div class='left'>
+         店型组：
           <el-select v-model="selectedTypes" style="width: 210px;" collapse-tags multiple placeholder="请选择">
               <el-option
                 v-for="item in shopTypes"
@@ -193,7 +202,13 @@
           <el-checkbox-group v-model="checkShops" class='checkgroup'>
            <el-checkbox v-for="s in shops" :label="s.shopname" :key="s.shopid" :disabled="curshop === s.shopid" border>{{s.shopid+' - '+s.shopname}}</el-checkbox>
           </el-checkbox-group>
-        
+       </div>
+      <div class='right'>
+        品类店型组：
+        <el-checkbox-group v-model="checkShopSkuTypes" class='checkgroup'>
+           <el-checkbox v-for="s in shopSkuTypes" :label="s.kname" :key="s.kid" border>{{s.kname +' - '+s.skutype}}</el-checkbox>
+          </el-checkbox-group>
+      </div>         
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogSelectShopVisible = false">{{$t('table.cancel')}}</el-button>
         <el-button type="primary" @click="confirmShops">{{$t('table.confirm')}}</el-button>
@@ -204,6 +219,7 @@
 
 <script>
 import { groupBy, chunkArray } from '@/utils'
+import splitPane from 'vue-splitpane'
 
 
 const typeDesc=['部','课','大类','中类','小类','商品']
@@ -217,6 +233,8 @@ export default {
       type_shops: [],
       functionSettings: [],
       checkShops: [],
+      checkShopSkuTypes: [],
+      shopSkuTypes: [],
       curshop: null,
       curfunc: 1,
       search_str: '',
@@ -253,6 +271,7 @@ export default {
       filterStr: ''
     }    
   },
+  components: { splitPane },
   computed: {
     shopTypes () {
       return this.type_shops.filter(function (s, i, arr) {
@@ -306,7 +325,7 @@ export default {
     arrayToCsv(data, args = {}) {
       let columnDelimiter = args.columnDelimiter || ',';
       let lineDelimiter = args.lineDelimiter || '\n';
-      const cols =["审批功能号","店铺号","商品ID","最大订货倍数","最大促销订货倍数","最大订货金额","每日最大订货数","每日最大订货金额","商品名","课","小类","进价","最小订货数"]
+      const cols =["审批功能号","店铺号","商品ID","最大订货倍数","最大促销订货倍数","最大订货金额","每日最大订货数","每日最大订货金额","商品码","商品名","课ID","课名","小类ID","小类名","进价","最小订货数"]
        return cols.join(columnDelimiter) + lineDelimiter + data.reduce((csv, row) => {
          const rowContent = cols.reduce((rowTemp, col) => {
           let ret = rowTemp ? rowTemp + columnDelimiter : rowTemp;
@@ -331,7 +350,7 @@ export default {
           let link = document.createElement('a')
           link.style.display = 'none'
           link.href = url
-          link.setAttribute('download', this.curshop + '.csv')
+          link.setAttribute('download', this.curshop + '-审批功能设置导出.csv')
           document.body.appendChild(link)
           link.click()
           document.body.removeChild(link);
@@ -656,38 +675,40 @@ $light_gray:#fff;
     color: grey;
   }
   .bottom{
-    overflow-x: scroll;
+    overflow-y: scroll;
     max-height: 600px;
   }
   .content{
     border:2px solid beige;
     border-radius: 1px;
-    padding: 10px;
     min-height: 600px;
-    display: flex;
-    .left{
+    position: relative;
+    .splitpane{
+      position: static;
+      width:100%;
+      .left{
       border:2px solid beige;
       border-radius: 1px;
       padding: 10px;
 
       flex-grow: 1;
-      min-width: 400px;
       .header{
         display: flex;
         justify-content: space-between;
       }
-    }
-    .right{
-      border:2px solid beige;
-      border-radius: 1px;
-      padding: 10px;
-      flex-grow: 2;
-      overflow-x: scroll;
-      .fstable{
+      }
+      .right{
         border:2px solid beige;
         border-radius: 1px;
+        flex-grow: 2;
+        overflow-x: scroll;
+        .fstable{
+          border:2px solid beige;
+          border-radius: 1px;
+        }
       }
     }
+    
   }
   .checkgroup{
     display: flex;

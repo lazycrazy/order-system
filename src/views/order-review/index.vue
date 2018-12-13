@@ -18,7 +18,7 @@
     
 
     
-        <el-table class='fstable' ref="head"  highlight-current-row @row-click="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
+        <el-table highlight-current-row class='fstable' ref="head"  highlight-current-row @row-click="handleCurSheetChange" v-loading="table_loading" :data="sheets" >
           <el-table-column   type="index"   width="50"> </el-table-column>
           <el-table-column  prop="ShopName"   label="店铺" width='190'></el-table-column>     
           <el-table-column   prop="SheetID"  width='160' label="单号"  ></el-table-column>
@@ -61,9 +61,9 @@
           <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="curpage" :page-sizes="[10,20,30,50]" :page-size="page_size" layout="total, sizes, prev, pager, next, jumper" :total="total">
           </el-pagination>
        
-          <el-tabs class='tab' value='first' type="border-card">
+          <el-tabs class='tab' value='first' type="border-card" @tab-click='doLayout'>
             <el-tab-pane label="明细" name="first">
-              <el-table fit :row-style="rowClass" class='items' v-loading="table_loading" :data="items" max-height='500'  width='100%' >
+              <el-table  fit ref='bottomleft' :row-style="rowClass" class='items' v-loading="table_loading" :data="items" max-height='500'  width='100%' >
                 <el-table-column type="index" width="50" fixed></el-table-column>
                 <el-table-column label="操作" width="150">
                    <template slot-scope="scope">
@@ -85,7 +85,7 @@
               </el-table>
             </el-tab-pane>
             <el-tab-pane label="日志" name="second">
-              <el-table fit max-height="500" class='logs' v-loading="table_loading":data="logs" width='100%' >
+              <el-table  fit ref='bottomright' max-height="500" class='logs' v-loading="table_loading":data="logs" width='100%' >
                 <el-table-column type="index" width="50"></el-table-column>      
                 <el-table-column label="记录时间" >
                   <template slot-scope="scope">
@@ -206,9 +206,13 @@ export default {
     },
   },
   async created() {
-    console.log(process.env.SYS)
+    // console.log(process.env.SYS + 'created')
     await this.fetchData()
   },
+  // async mounted() {
+  //   console.log('mounted')
+  //   await this.fetchData()
+  // },
   methods: {
     rowClass({row, rowIndex}) {
       if (row.reason.trim().length > 0) {
@@ -330,6 +334,9 @@ export default {
       this.shops = res.sort((a,b)=>(a.value>b.value?1:(b.value >a.value? -1 : 0)))
       if (this.shops.length > 0) {
         this.curshop = this.shops[0].value
+        // console.log(this.$route)
+        // if(this.$route.query.shopid)
+        //    this.curshop = this.$route.query.shopid
         this.handleShopChange() 
       }
       
@@ -397,6 +404,13 @@ export default {
       if(this.IsHQ && shopServerUrl)
         this.shopServerUrl = shopServerUrl + '/api'
       await this.SearchSheet()     
+    },
+    doLayout(tab) {
+       if(tab.name === 'first') {
+         this.$refs.bottomleft.doLayout();
+       } else {
+         this.$refs.bottomright.doLayout();
+       }
     },
     handleSizeChange(val) {
       this.page_size = val

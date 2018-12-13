@@ -17,7 +17,11 @@
       </template>
     </el-table-column>
     <el-table-column label="店铺服务地址" prop='ServerUrl'></el-table-column> 
-    <el-table-column label="需三审单据数" prop='Need3ReviewCount'> </el-table-column>
+    <el-table-column label="需三审单据数" >
+      <template slot-scope="scope">
+        <router-link :to="path" > {{ scope.row.Need3ReviewCount }} </router-link>
+      </template>
+    </el-table-column>
   </el-table>
   </div>
 </template>
@@ -30,7 +34,8 @@ export default {
   data(){
     return {
       IsHQ: process.env.SYS === "HQ",
-      shopInfos: []
+      shopInfos: [],
+      path:'order-review/index'
     }
   },
   async mounted() {

@@ -20,6 +20,7 @@
       <el-input v-model="barcodeid" placeholder="商品码" style="width:200px"></el-input>
 
       <el-button type="primary" @click.native.prevent="SearchSheet">{{$t('table.search')}}</el-button>
+      <el-button type="primary" @click.native.prevent="exportDoc">{{$t('table.export')}}</el-button>
     </div>
     
  
@@ -154,6 +155,49 @@ export default {
           shopServerUrl = res[0].ServerUrl
       }
       return shopServerUrl
+    },
+    arrayToCsv(data, args = {}) {
+      let columnDelimiter = args.columnDelimiter || ',';
+      let lineDelimiter = args.lineDelimiter || '\n';
+      const cols =["店铺ID",'店铺名',"审核日期","课ID","课名","小类ID","小类名","商品ID","商品码","商品名","商品条码","最小订货数","申请订货数","批准订货数"]
+       return cols.join(columnDelimiter) + lineDelimiter + data.reduce((csv, row) => {
+         const rowContent = cols.reduce((rowTemp, col) => {
+          let ret = rowTemp ? rowTemp + columnDelimiter : rowTemp;
+          let formatedCol = row[col].toString().trim().replace(new RegExp(lineDelimiter, 'g'), ' ');
+          ret += /,/.test(formatedCol) ? `"${formatedCol}"` : formatedCol;
+          return ret;
+        }, '')
+        return (csv ? csv + lineDelimiter : '') + rowContent;
+      }, '');
+    },
+    async exportDoc() {
+      this.$confirm('确认导出?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          const rs = await this.$store.dispatch('GetQTYExport',{ shopid: this.curshop, sheetid: this.sheetid.trim(), dates: this.editDateParam[0], datee: this.editDateParam[1], barcodeid: this.barcodeid.trim(), auth: this.auth, shopServerUrl: this.shopServerUrl })
+          const csv = this.arrayToCsv(rs);
+          const BOM = '\uFEFF'; 
+          let url = window.URL.createObjectURL(new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' }))
+          let link = document.createElement('a')
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', this.curshop + '-实际补货量导出.csv')
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link);
+
+          this.$message({
+            type: 'success',
+            message: '导出成功!'
+          });
+        }).catch((e) => {
+          this.$message({
+            type: 'info',
+            message: 'cancel'==e? '已取消导出' :'导出失败,'+ e
+          });          
+        });
     },
     async SearchSheet() {
       if(!this.curshop) return       
