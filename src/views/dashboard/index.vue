@@ -23,6 +23,25 @@
       </template>
     </el-table-column>
   </el-table>
+  <el-table v-if='IsSC'
+    :data="purchaseInfos"
+    style="width: 50%">
+    <el-table-column label="已审核数" >
+      <template slot-scope="scope">
+        <router-link :to="purPath" > {{ scope.row.已审核数 }} </router-link>
+      </template>
+    </el-table-column> 
+    <el-table-column label="待审核数" >
+      <template slot-scope="scope">
+        <router-link :to="purPath" > {{ scope.row.待审核数 }} </router-link>
+      </template>
+    </el-table-column> 
+    <el-table-column label="驳回数" >
+      <template slot-scope="scope">
+        <router-link :to="purPath" > {{ scope.row.驳回数 }} </router-link>
+      </template>
+    </el-table-column> 
+  </el-table>
   </div>
 </template>
 
@@ -34,8 +53,11 @@ export default {
   data(){
     return {
       IsHQ: process.env.SYS === "HQ",
+      IsSC: process.env.SYS === "SC",
       shopInfos: [],
-      path:'order-review/index'
+      purchaseInfos: [],
+      path:'order-review/index',
+      purPath:'order-review-query/index'
     }
   },
   async mounted() {
@@ -43,8 +65,10 @@ export default {
   },
   methods: {
     async fetchData() {
-      if(!this.IsHQ) return
-      this.shopInfos = await this.$store.dispatch('GetShopServerInfos')      
+      if(this.IsHQ) 
+        this.shopInfos = await this.$store.dispatch('GetShopServerInfos')      
+      if(this.IsSC) 
+        this.purchaseInfos = await this.$store.dispatch('GetPurchaseInfos')
     },
     async syncMaster() {
       if(this.IsHQ) return

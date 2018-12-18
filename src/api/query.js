@@ -15,6 +15,14 @@ export function getUserInfo() {
   })
 }
 
+export function getShopSkuTypes(data) {
+  return request({
+    url: `/query/shopsSkuType`,
+    method: 'post',
+    data
+  })
+}
+
 export function getFSExport(data) {
   return request({
     url: `/query/fsExport`,
@@ -73,6 +81,12 @@ export function getShopServerInfos() {
   })
 }
 
+export function getPurchaseInfos() {
+  return request({
+    url: `/query/purchaseInfos`,
+    method: 'get'
+  })
+}
 export function getGoodsIdBySF(data) {
   return request({
     url: `/query/goodsIdsBySF`,

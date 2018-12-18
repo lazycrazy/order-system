@@ -23,6 +23,7 @@ import {
   deleteItem,
   getGoodsIdBySF,
   getShopServerInfos,
+  getPurchaseInfos,
   getShopServerUrl,
   functionSettingImport,
   getShopTypes,
@@ -31,7 +32,8 @@ import {
   getUserDepts,
   syncMaster,
   getFSExport,
-  getQTYExport
+  getQTYExport,
+  getShopSkuTypes
 } from '@/api/query'
 
 const query = {
@@ -50,6 +52,10 @@ const query = {
       const res = await getUserDepts()
       return res.data
     }, 
+    async GetShopSkuTypes({ commit }, data) {
+      const res = await getShopSkuTypes(data)
+      return res.data
+    },
     async GetFSExport({ commit }, data) {
       const res = await getFSExport(data)
       return res.data
@@ -72,6 +78,10 @@ const query = {
     },
     async GetShopServerInfos({ commit }, ) {
       const res = await getShopServerInfos()
+      return res.data
+    },
+    async GetPurchaseInfos({ commit }, ) {
+      const res = await getPurchaseInfos()
       return res.data
     },
     async GetGoodsIdBySF({ commit }, data) {

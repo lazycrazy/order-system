@@ -9,7 +9,7 @@
       :value="item.shopid">
     </el-option>
   </el-select>
-  <el-button type="primary" @click.native.prevent="dialogSelectShopVisible=true">复制应用到它店</el-button>
+  <el-button type="primary" @click.native.prevent="handleOpenSelectShops">复制应用到它店</el-button>
   <label  v-if='IsHQ' class='import'>
     <input ref='import' type="file" @change="fsImport1" accept=".csv" v-show='false'/>
     导入
@@ -188,8 +188,15 @@
     </el-dialog>
        
 
-  <el-dialog title="选择应用同样设置的店" :visible.sync="dialogSelectShopVisible"  width="30%">
-       <div class='left'>
+  <el-dialog title="选择应用同样设置的店" :visible.sync="dialogSelectShopVisible" width='50%' class='dialog-copy'>
+    <div class='body' style="display:flex;justify-content:space-around">
+      <div class='left' style='width:250px'>
+        品类店型组：
+        <el-checkbox-group v-model="checkShopSkuTypes" class='checkgroup'>
+           <el-checkbox v-for="s in shopSkuTypes" :label="s.kid_skutype" :key="s.kid" border>{{s.skutype+'('+s.kid+s.kname +')'}}</el-checkbox>
+          </el-checkbox-group>
+      </div>  
+       <div class='right'>
          店型组：
           <el-select v-model="selectedTypes" style="width: 210px;" collapse-tags multiple placeholder="请选择">
               <el-option
@@ -200,15 +207,12 @@
               </el-option>
           </el-select>
           <el-checkbox-group v-model="checkShops" class='checkgroup'>
-           <el-checkbox v-for="s in shops" :label="s.shopname" :key="s.shopid" :disabled="curshop === s.shopid" border>{{s.shopid+' - '+s.shopname}}</el-checkbox>
+           <el-checkbox v-for="s in shops" :label="s.shopid" :key="s.shopid" :disabled="curshop === s.shopid" border>{{s.shopid+' - '+s.shopname}}</el-checkbox>
           </el-checkbox-group>
        </div>
-      <div class='right'>
-        品类店型组：
-        <el-checkbox-group v-model="checkShopSkuTypes" class='checkgroup'>
-           <el-checkbox v-for="s in shopSkuTypes" :label="s.kname" :key="s.kid" border>{{s.kname +' - '+s.skutype}}</el-checkbox>
-          </el-checkbox-group>
-      </div>         
+    </div>
+       
+             
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogSelectShopVisible = false">{{$t('table.cancel')}}</el-button>
         <el-button type="primary" @click="confirmShops">{{$t('table.confirm')}}</el-button>
@@ -279,7 +283,7 @@ export default {
       })
     },
     shops () {
-      return this.type_shops.filter(f=> this.selectedTypes.includes(f.shoptypeid) && f.shopid !== this.curshop)
+      return this.type_shops.filter(f=> this.selectedTypes.includes(f.shoptypeid) )
     },
   },
   async created() {
@@ -503,7 +507,13 @@ export default {
       this.curpage = val
       this.refreshFunctionSettings()
     },
-    handleOpenSelectShops(){
+    async handleOpenSelectShops(){
+      this.shopSkuTypes = []
+      this.checkShopSkuTypes = []
+      this.checkShops = []
+      this.selectedTypes = []
+      const rs = await this.$store.dispatch('GetShopSkuTypes', {shops: [this.curshop]})       
+      this.shopSkuTypes = rs
       this.dialogSelectShopVisible = true
     },
     handleAdd() {
@@ -579,8 +589,30 @@ export default {
       
     },
     async confirmShops() { 
-      if(this.checkShops.length ===0) return
-      const res = await this.$store.dispatch('SetFunctionSettingByShop', {curshop: this.curshop, shops: this.checkShops})
+      if(this.checkShopSkuTypes.length ===0) {
+        this.$message.error('请勾选品类店型组');
+        return
+      }
+      if(this.checkShops.length ===0) {
+        this.$message.error('请勾选店铺');
+        return
+      }
+      //检查
+      const skutypes = await this.$store.dispatch('GetShopSkuTypes', {shops: this.checkShops})      
+      for(const s of this.checkShops){
+        if(!skutypes.some(t=>t.shopid==s)){
+          this.$message.error(s+'-没有所选品类店型组');
+          return
+        }
+        for(const t of this.checkShopSkuTypes){
+          if(!skutypes.some(ty=>ty.shopid==s&&ty.kid_skutype==t)){
+            this.$message.error(s+'-没有所选品类店型组-'+t);
+            return
+          }
+        }
+      }
+      
+      const res = await this.$store.dispatch('SetFunctionSettingByShop', {curshop: this.curshop,kids: this.checkShopSkuTypes.map(kt=>kt.split('-')[0]), shops: this.checkShops})
       // console.log(res)
       this.dialogSelectShopVisible = false
       this.checkShops= []
