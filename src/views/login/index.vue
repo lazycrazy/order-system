@@ -2,7 +2,7 @@
   <div class="login-container">
     <el-form class="login-form" autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left">
       <div class="title-container">
-        <h3 class="title">{{$t('login.title')}}</h3>
+        <h3 class="title">{{SYS + ' - ' + $t('login.title')}}</h3>
         <!-- <lang-select class="set-language"></lang-select> -->
       </div>
       <el-form-item prop="username">
@@ -71,6 +71,7 @@ export default {
       }
     }
     return {
+      SYS: process.env.SYS === "HQ"?"总部":"店铺",
       loginForm: {
         username: '',
         password: ''

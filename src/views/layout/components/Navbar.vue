@@ -27,7 +27,7 @@
       <el-tooltip effect="dark" :content="StoreAndUserInfo" placement="bottom-end">
           <div class="avatar-wrapper">
             <!--<img class="user-avatar" />{{SYS}}  :src="avatar || '/img/user.png'">-->
-            <div class="user-avatar" >{{SYS}}</div>
+            <div class="user-avatar" >{{'订货审批系统-' + SYS + '版'}}</div>
             <i class="el-icon-caret-bottom"></i>
           </div>
       </el-tooltip>
@@ -186,8 +186,8 @@ export default {
         position: relative;
         .user-avatar {
           display: flex;
+          font-weight: bold;
           align-items: center;
-          width: 40px;
           height: 40px;
           border-radius: 10px;
         }
