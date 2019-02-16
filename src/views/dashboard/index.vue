@@ -33,7 +33,7 @@
     </el-table-column> 
     <el-table-column label="待审核数" >
       <template slot-scope="scope">
-        <router-link :to="purPath" > {{ scope.row.待审核数 }} </router-link>
+        <router-link :to="path" > {{ scope.row.待审核数 }} </router-link>
       </template>
     </el-table-column> 
     <el-table-column label="驳回数" >
